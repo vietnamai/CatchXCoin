@@ -4,6 +4,7 @@
 function initTelegram() {
     // Kiểm tra nếu Telegram Web App SDK có sẵn
     if (typeof Telegram.WebApp === "undefined") {
+        alert("Telegram Web App SDK is not available.")
         console.error("Telegram Web App SDK is not available.");
         return;
     }
