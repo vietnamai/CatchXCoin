@@ -29,6 +29,7 @@ function saveUserInfoToFirebase(userId, firstName, lastName, username, avatar) {
     }).then(() => {
         console.log(`User ${firstName} ${lastName} saved to Firebase.`);
     }).catch((error) => {
+        alert(error)
         console.error("Error saving user info to Firebase:", error);
     });
 }
