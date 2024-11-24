@@ -14,6 +14,7 @@ function initTelegram() {
 
     // Hiển thị thông tin người dùng
     console.log("User Info:", tg.initDataUnsafe.user);
+    alert(tg.initDataUnsafe.user)
 
     // Lấy thông tin người dùng
     const user = tg.initDataUnsafe.user;
@@ -26,16 +27,7 @@ function initTelegram() {
     // Lưu thông tin người dùng vào Firebase
     saveUserInfoToFirebase(userId, firstName, lastName, username, avatar);
 
-    // Gửi dữ liệu đến bot Telegram (nếu cần thiết)
-    // Ví dụ: gửi "balance" khi người dùng nhấn nút
-    tg.MainButton.onClick(() => {
-        console.log("Balance check clicked!");
-    });
-
-    tg.MainButton.text = "Check Balance";
-    tg.MainButton.show();
 }
 
 // Gọi hàm khởi tạo Telegram Web App
-alert("a")
 initTelegram();
