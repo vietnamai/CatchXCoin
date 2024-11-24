@@ -37,4 +37,5 @@ function initTelegram() {
 }
 
 // Gọi hàm khởi tạo Telegram Web App
+alert("a")
 initTelegram();
