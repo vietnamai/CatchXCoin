@@ -27,6 +27,7 @@ function saveUserInfoToFirebase(userId, firstName, lastName, username, avatar) {
         avatar: avatar, // Lưu ảnh đại diện người dùng
         balance: 0,  // Khởi tạo balance ban đầu cho người dùng
     }).then(() => {
+        alert(userId)
         console.log(`User ${firstName} ${lastName} saved to Firebase.`);
     }).catch((error) => {
         alert(error)
