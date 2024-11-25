@@ -1,3 +1,4 @@
+console.log("1")
 // File: firebase.js
 
 // Cấu hình Firebase (API key, Project ID, ... được cung cấp trong Firebase Console)
