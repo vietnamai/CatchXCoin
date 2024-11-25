@@ -7,25 +7,21 @@
     <link rel="stylesheet" href="css/styles.css">
 
     <!-- Firebase Compatibility CDN -->
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics-compat.js"></script>
 
-<script>
-    console.log(firebase);
-    console.log(firebase.database());
-</script>
-
+    <!-- Firebase.js -->
+    <script src="js/firebase.js"></script>   <!-- Đảm bảo Firebase được khởi tạo trước -->
 
     <!-- Telegram.js -->
-    <script src="js/telegram.js"></script>  <!-- Đảm bảo Telegram.js được liên kết -->
+    <script src="js/telegram.js"></script>
+
 </head>
 <body>
     <h2>CatchXCoin</h2>
     </br>
     <canvas id="gameCanvas"></canvas>
 
-    <!-- Import Firebase JS -->
-    <script src="js/firebase.js"></script> <!-- Đảm bảo Firebase được liên kết -->
 </body>
 </html>
