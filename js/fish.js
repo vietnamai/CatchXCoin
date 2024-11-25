@@ -84,7 +84,6 @@ const fishTypes = [
         ],
         mixin: { maxSpeed: 3, minSpeed: 1, maxNumGroup: 3 }
     },
-    // Thêm các loại cá còn lại
     {
         frames: [
             { rect: [0, 0, 80, 60] },
@@ -120,15 +119,6 @@ const fishTypes = [
             { rect: [0, 270, 120, 90] }
         ],
         mixin: { maxSpeed: 2.0, minSpeed: 0.6, maxNumGroup: 5 }
-    },
-    {
-        frames: [
-            { rect: [0, 0, 130, 100] },
-            { rect: [0, 100, 130, 100] },
-            { rect: [0, 200, 130, 100] },
-            { rect: [0, 300, 130, 100] }
-        ],
-        mixin: { maxSpeed: 1.5, minSpeed: 0.5, maxNumGroup: 2 }
     }
 ];
 
