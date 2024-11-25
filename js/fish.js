@@ -15,11 +15,21 @@ class Fish {
         this.frameWidth = rect[2];
         this.frameHeight = rect[3];
 
-        // Vị trí và tốc độ di chuyển
+        // Vị trí và hướng di chuyển
         this.x = Math.random() * window.innerWidth;
         this.y = Math.random() * window.innerHeight;
-        this.speedX = Math.random() * (type.mixin.maxSpeed - type.mixin.minSpeed) + type.mixin.minSpeed;
-        this.speedY = Math.random() * (type.mixin.maxSpeed - type.mixin.minSpeed) + type.mixin.minSpeed;
+        this.rotation = Math.random() * 360; // Góc quay ban đầu
+        this.speed = Math.random() * (type.mixin.maxSpeed - type.mixin.minSpeed) + type.mixin.minSpeed;
+
+        // Tính toán vận tốc từ góc quay
+        this.updateDirection();
+    }
+
+    // Cập nhật hướng di chuyển dựa trên góc quay
+    updateDirection() {
+        const radian = this.rotation * (Math.PI / 180); // Chuyển góc sang radian
+        this.speedX = Math.cos(radian) * this.speed;
+        this.speedY = Math.sin(radian) * this.speed;
     }
 
     // Di chuyển cá
@@ -27,9 +37,15 @@ class Fish {
         this.x += this.speedX;
         this.y += this.speedY;
 
-        // Đổi hướng nếu cá chạm biên
-        if (this.x > window.innerWidth || this.x < 0) this.speedX = -this.speedX;
-        if (this.y > window.innerHeight || this.y < 0) this.speedY = -this.speedY;
+        // Kiểm tra nếu cá chạm biên
+        if (this.x < 0 || this.x > window.innerWidth) {
+            this.rotation = 180 - this.rotation; // Đổi hướng ngang
+            this.updateDirection();
+        }
+        if (this.y < 0 || this.y > window.innerHeight) {
+            this.rotation = 360 - this.rotation; // Đổi hướng dọc
+            this.updateDirection();
+        }
     }
 
     // Cập nhật hoạt ảnh
@@ -46,15 +62,19 @@ class Fish {
         const { rect } = this.frames[this.currentFrame];
         const [sx, sy, sWidth, sHeight] = rect;
 
+        ctx.save();
+        ctx.translate(this.x, this.y); // Chuyển đến vị trí cá
+        ctx.rotate((this.rotation * Math.PI) / 180); // Xoay canvas theo góc quay
         ctx.drawImage(
             this.spriteSheet, // Sprite sheet của cá
             sx, sy, sWidth, sHeight, // Cắt khung hình
-            this.x, this.y, sWidth, sHeight // Vẽ lên canvas
+            -sWidth / 2, -sHeight / 2, sWidth, sHeight // Vẽ khung hình ở vị trí xoay
         );
+        ctx.restore();
     }
 }
 
-// Dữ liệu loại cá từ sprite sheet
+// Dữ liệu loại cá từ sprite sheet (dựa trên R.js)
 const fishTypes = [
     {
         frames: [
@@ -84,42 +104,7 @@ const fishTypes = [
         ],
         mixin: { maxSpeed: 3, minSpeed: 1, maxNumGroup: 3 }
     },
-    {
-        frames: [
-            { rect: [0, 0, 80, 60] },
-            { rect: [0, 60, 80, 60] },
-            { rect: [0, 120, 80, 60] },
-            { rect: [0, 180, 80, 60] }
-        ],
-        mixin: { maxSpeed: 2.2, minSpeed: 0.8, maxNumGroup: 4 }
-    },
-    {
-        frames: [
-            { rect: [0, 0, 90, 70] },
-            { rect: [0, 70, 90, 70] },
-            { rect: [0, 140, 90, 70] },
-            { rect: [0, 210, 90, 70] }
-        ],
-        mixin: { maxSpeed: 1.8, minSpeed: 0.7, maxNumGroup: 3 }
-    },
-    {
-        frames: [
-            { rect: [0, 0, 100, 80] },
-            { rect: [0, 80, 100, 80] },
-            { rect: [0, 160, 100, 80] },
-            { rect: [0, 240, 100, 80] }
-        ],
-        mixin: { maxSpeed: 2.5, minSpeed: 1.0, maxNumGroup: 4 }
-    },
-    {
-        frames: [
-            { rect: [0, 0, 120, 90] },
-            { rect: [0, 90, 120, 90] },
-            { rect: [0, 180, 120, 90] },
-            { rect: [0, 270, 120, 90] }
-        ],
-        mixin: { maxSpeed: 2.0, minSpeed: 0.6, maxNumGroup: 5 }
-    }
+    // Các loại cá khác từ R.js...
 ];
 
 // Tải sprite sheet và tạo đối tượng cá
