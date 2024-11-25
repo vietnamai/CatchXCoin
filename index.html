@@ -5,24 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CatchXCoin: Dive Into the World of Fishing & Rewards</title>
     <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
 
-    <!-- Firebase Compatibility CDN -->
+    <!-- Firebase SDK v9 Compat (for compatibility with old Firebase code) -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics-compat.js"></script>
 
-    <!-- Firebase.js -->
-    <script src="js/firebase.js"></script>   <!-- Đảm bảo Firebase được khởi tạo trước -->
-
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-    <!-- Telegram.js -->
+    <!-- Your own JS files -->
+    <script src="js/firebase.js"></script>
     <script src="js/telegram.js"></script>
-
-</head>
-<body>
-
-    <canvas id="gameCanvas"></canvas>
-
+    <script src="js/antiFraud.js"></script>
 </body>
 </html>
