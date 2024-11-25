@@ -31,4 +31,4 @@ function initTelegram() {
 
 // Gọi hàm khởi tạo Telegram Web App
 initTelegram();
-console.log("2")
+alert("2")
