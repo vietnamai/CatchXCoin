@@ -11,7 +11,8 @@ try {
         storageBucket: "catchxcoin.firebasestorage.app",
         messagingSenderId: "1044694743228",
         appId: "1:1044694743228:web:a50528274809fc880178b9",
-        measurementId: "G-3HL2PJ5SRD"
+        measurementId: "G-3HL2PJ5SRD",
+        databaseURL: "https://catchxcoin-default-rtdb.asia-southeast1.firebasedatabase.app/"
     };
 
     // Khởi tạo Firebase
