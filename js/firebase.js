@@ -1,58 +1,38 @@
-// File: firebase.js
+// File: js/firebase.js
 
-let app, db; // Biến toàn cục để lưu trữ Firebase App và Database
+// Cấu hình Firebase của bạn
+const firebaseConfig = {
+  apiKey: "AIzaSyCOHdI4tVObleAkiuIUymMBNEz3OPue-7Y",
+  authDomain: "catchxcoin.firebaseapp.com",
+  projectId: "catchxcoin",
+  storageBucket: "catchxcoin.firebasestorage.app",
+  messagingSenderId: "1044694743228",
+  appId: "1:1044694743228:web:a50528274809fc880178b9",
+  measurementId: "G-3HL2PJ5SRD"
+};
 
-try {
-    // Cấu hình Firebase
-    const firebaseConfig = {
-        apiKey: "AIzaSyCOHdI4tVObleAkiuIUymMBNEz3OPue-7Y",
-        authDomain: "catchxcoin.firebaseapp.com",
-        projectId: "catchxcoin",
-        storageBucket: "catchxcoin.firebasestorage.app",
-        messagingSenderId: "1044694743228",
-        appId: "1:1044694743228:web:a50528274809fc880178b9",
-        measurementId: "G-3HL2PJ5SRD",
-        databaseURL: "https://catchxcoin-default-rtdb.asia-southeast1.firebasedatabase.app/"
-    };
+// Khởi tạo Firebase
+firebase.initializeApp(firebaseConfig);
 
-    console.log("Initializing Firebase...");
-    app = firebase.initializeApp(firebaseConfig); // Khởi tạo Firebase với cấu hình
-    db = firebase.database(); // Kết nối tới Realtime Database
-    console.log("Firebase initialized successfully.");
-
-} catch (error) {
-    console.error("Error initializing Firebase:", error);
-}
-
-/**
- * Kiểm tra xem người dùng đã có trên Firebase chưa, nếu chưa thì tạo mới
- * @param {string} userId - ID người dùng Telegram
- * @param {object} userInfo - Thông tin người dùng (first_name, last_name, username, avatar)
- */
-function checkAndAddUser(userId, userInfo) {
-    const userRef = db.ref('users/' + userId);
-
+// Lấy thông tin người dùng từ Telegram và lưu vào Firebase
+function saveUserInfoToFirebase(userId, firstName, lastName, username, avatar) {
+    const userRef = firebase.database().ref('users/' + userId);
+    
+    // Kiểm tra xem người dùng đã có trong database chưa
     userRef.once('value', (snapshot) => {
         if (!snapshot.exists()) {
-            // Nếu người dùng chưa tồn tại, thêm vào
-            console.log(`User ${userId} does not exist. Adding to Firebase...`);
-            
-            // Lưu thông tin người dùng vào Firebase
+            // Nếu người dùng chưa có, thêm vào Firebase
             userRef.set({
-                first_name: userInfo.first_name,
-                last_name: userInfo.last_name,
-                username: userInfo.username,
-                avatar: userInfo.avatar,  // Lưu ảnh đại diện người dùng
+                first_name: firstName,
+                last_name: lastName,
+                username: username,
+                avatar: avatar,
                 balance: 0,  // Khởi tạo balance ban đầu cho người dùng
             }).then(() => {
-                console.log(`User ${userId} added to Firebase with details.`);
+                console.log("User information saved to Firebase.");
             }).catch((error) => {
-                console.error(`Error adding user ${userId} to Firebase:`, error);
+                console.error("Error saving user info: ", error);
             });
-        } else {
-            console.log(`User ${userId} already exists in Firebase.`);
         }
-    }).catch((error) => {
-        console.error("Error checking user existence:", error);
     });
 }
