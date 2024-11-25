@@ -24,7 +24,7 @@ function createFish(type, spriteSheet) {
 
 // Hàm lấy hoạt ảnh của cá theo trạng thái
 function getFishAnimation(type, state) {
-    const fish = fishTypes.find(f => f.image.includes(type)); // Lấy loại cá dựa vào tên file
+    const fish = fishTypes.find(f => f.image === type); // Lấy loại cá dựa vào tên file
     if (!fish) {
         console.error(`Fish type "${type}" not found.`);
         return null;
