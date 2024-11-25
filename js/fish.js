@@ -1,6 +1,28 @@
 // File: js/fish.js
 
-// Hàm lấy khung hình cá theo trạng thái
+// Hàm tạo đối tượng cá từ dữ liệu trong R_Fish.js
+function createFish(type, spriteSheet) {
+    this.type = type;
+    this.spriteSheet = spriteSheet;
+    this.frames = getFishAnimation(type, "swim").frames; // Mặc định cá ở trạng thái bơi
+    this.currentFrame = 0;
+    this.frameDelay = type.mixin.interval;
+    this.delayCounter = 0;
+
+    const { rect } = this.frames[0];
+    this.frameWidth = rect[2];
+    this.frameHeight = rect[3];
+
+    this.x = Math.random() * window.innerWidth;
+    this.y = Math.random() * window.innerHeight;
+    this.rotation = Math.random() * 360;
+    this.speed = Math.random() * (type.mixin.maxSpeed - type.mixin.minSpeed) + type.mixin.minSpeed;
+
+    this.updateDirection();
+    this.polyArea = type.polyArea.map(point => ({ x: point.x, y: point.y }));
+}
+
+// Hàm lấy hoạt ảnh của cá theo trạng thái
 function getFishAnimation(type, state) {
     const fish = fishTypes.find(f => f.image.includes(type)); // Lấy loại cá dựa vào tên file
     if (!fish) {
@@ -27,100 +49,51 @@ function getFishAnimation(type, state) {
     };
 }
 
-// Hàm tạo đối tượng cá
-function createFish(type) {
-    const swimAnimation = getFishAnimation(type, "swim"); // Lấy hoạt ảnh bơi
-    if (!swimAnimation) return null;
+// Cập nhật hướng di chuyển của cá
+createFish.prototype.updateDirection = function () {
+    const radian = this.rotation * (Math.PI / 180);
+    this.speedX = Math.cos(radian) * this.speed;
+    this.speedY = Math.sin(radian) * this.speed;
+};
 
-    const fish = {
-        type: type,
-        image: swimAnimation.image,
-        frames: swimAnimation.frames,
-        polyArea: swimAnimation.polyArea,
-        mixin: swimAnimation.mixin,
-        x: Math.random() * window.innerWidth, // Vị trí ban đầu ngẫu nhiên
-        y: Math.random() * window.innerHeight,
-        speedX: Math.random() * (swimAnimation.mixin.maxSpeed - swimAnimation.mixin.minSpeed) + swimAnimation.mixin.minSpeed,
-        speedY: Math.random() * (swimAnimation.mixin.maxSpeed - swimAnimation.mixin.minSpeed) + swimAnimation.mixin.minSpeed,
-        state: "swim" // Trạng thái ban đầu là bơi
-    };
-
-    return fish;
-}
-
-// Hàm cập nhật trạng thái cá
-function updateFishState(fish, state) {
-    const animation = getFishAnimation(fish.type, state);
-    if (!animation) return;
-
-    fish.frames = animation.frames;
-    fish.state = state;
-
-    if (state === "capture") {
-        // Thêm logic khi cá bị bắn chết
-        console.log(`Fish ${fish.type} captured!`);
+// Cập nhật trạng thái cá
+createFish.prototype.updateAnimation = function (state) {
+    this.delayCounter++;
+    if (this.delayCounter >= this.frameDelay) {
+        this.frames = getFishAnimation(this.type, state).frames; // Cập nhật lại khung hình theo trạng thái
+        this.currentFrame = (this.currentFrame + 1) % this.frames.length;
+        this.delayCounter = 0;
     }
-}
+};
 
-// Hàm vẽ cá lên canvas
-function drawFish(ctx, fish, frameIndex) {
-    const frame = fish.frames[frameIndex % fish.frames.length];
-    const image = new Image();
-    image.src = `images/${fish.image}`;
+// Cập nhật vị trí cá
+createFish.prototype.move = function () {
+    this.x += this.speedX;
+    this.y += this.speedY;
 
-    image.onload = () => {
-        ctx.drawImage(
-            image,
-            frame.rect[0], frame.rect[1], frame.rect[2], frame.rect[3], // Sprite frame
-            fish.x, fish.y, frame.rect[2], frame.rect[3]                // Vị trí và kích thước trên canvas
-        );
-    };
-}
-
-// Hàm cập nhật vị trí cá
-function updateFishPosition(fish) {
-    fish.x += fish.speedX;
-    fish.y += fish.speedY;
-
-    // Đảo hướng nếu cá chạm mép màn hình
-    if (fish.x < 0 || fish.x + fish.frames[0].rect[2] > window.innerWidth) {
-        fish.speedX *= -1;
+    // Kiểm tra nếu cá chạm biên
+    if (this.x < 0 || this.x > window.innerWidth) {
+        this.rotation = 180 - this.rotation;
+        this.updateDirection();
     }
-    if (fish.y < 0 || fish.y + fish.frames[0].rect[3] > window.innerHeight) {
-        fish.speedY *= -1;
+    if (this.y < 0 || this.y > window.innerHeight) {
+        this.rotation = 360 - this.rotation;
+        this.updateDirection();
     }
-}
+};
 
-// Hàm chính cập nhật và vẽ tất cả cá
-function renderFishes(ctx, fishes) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Xóa canvas
+// Vẽ cá lên canvas
+createFish.prototype.draw = function (ctx) {
+    const { rect } = this.frames[this.currentFrame];
+    const [sx, sy, sWidth, sHeight] = rect;
 
-    fishes.forEach((fish, index) => {
-        updateFishPosition(fish);                     // Cập nhật vị trí
-        drawFish(ctx, fish, index);                   // Vẽ cá
-    });
-
-    requestAnimationFrame(() => renderFishes(ctx, fishes)); // Lặp lại
-}
-
-// Khởi tạo game
-function initFishGame() {
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-
-    const fishes = [];
-    const fishTypesList = ["fish1", "fish2", "fish3", "fish4", "fish5", "fish6", "fish7"];
-
-    // Tạo cá ngẫu nhiên
-    for (let i = 0; i < 20; i++) {
-        const randomType = fishTypesList[Math.floor(Math.random() * fishTypesList.length)];
-        const fish = createFish(randomType);
-        if (fish) fishes.push(fish);
-    }
-
-    // Bắt đầu vẽ cá
-    renderFishes(ctx, fishes);
-}
-
-// Chạy game khi window load
-window.onload = initFishGame;
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate((this.rotation * Math.PI) / 180);
+    ctx.drawImage(
+        this.spriteSheet,
+        sx, sy, sWidth, sHeight,
+        -sWidth / 2, -sHeight / 2, sWidth, sHeight
+    );
+    ctx.restore();
+};
