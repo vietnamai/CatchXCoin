@@ -4,7 +4,7 @@
 function initTelegram() {
     // Kiểm tra nếu Telegram Web App SDK có sẵn
     if (typeof Telegram.WebApp === "undefined") {
-        alert("error 1")
+        alert("Telegram Web app SDK is not available ")
         console.error("Telegram Web App SDK is not available.");
         return;
     }
@@ -27,7 +27,7 @@ function initTelegram() {
         saveUserInfoToFirebase(userId, firstName, lastName, username, avatar);
 
     } catch (error) {
-        alert("error 2")
+        alert("Error during Telegram WebApp initialization")
         console.error("Error during Telegram WebApp initialization:", error);
     }
 }
