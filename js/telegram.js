@@ -1,4 +1,4 @@
-// File: telegram.js
+// File: js/telegram.js
 
 // Hàm xử lý và giao tiếp với Telegram Web App
 function initTelegram() {
@@ -16,18 +16,13 @@ function initTelegram() {
         const user = tg.initDataUnsafe.user;
         console.log("User Info:", user);
         const userId = user.id;
-        const firstName = user.first_name || "";
-        const lastName = user.last_name || "";
-        const username = user.username || "";
-        const avatar = user.photo_url || ""; // URL của avatar người dùng
+        const firstName = user.first_name;
+        const lastName = user.last_name;
+        const username = user.username;
+        const avatar = user.photo_url; // URL của avatar người dùng
 
         // Lưu thông tin người dùng vào Firebase
-        checkAndAddUser(userId, {
-            first_name: firstName,
-            last_name: lastName,
-            username: username,
-            avatar: avatar,
-        });
+        saveUserInfoToFirebase(userId, firstName, lastName, username, avatar);
 
     } catch (error) {
         console.error("Error during Telegram WebApp initialization:", error);
