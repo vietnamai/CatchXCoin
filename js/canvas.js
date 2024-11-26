@@ -71,3 +71,6 @@ function updateUserBalance(userId, balance) {
     const userRef = firebase.database().ref('users/' + userId);
     userRef.update({ balance: balance });
 }
+
+
+export {canvas, ctx}
