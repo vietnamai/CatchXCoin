@@ -3,74 +3,62 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// Mảng lưu cá và súng
-const fishes = [];
-let currentCannonIndex = 0; // Vị trí súng hiện tại
-let currentCannon = null;
+// Set kích thước canvas
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-// Tạo cá và súng
+// Mảng lưu cá
+const fishes = [];
+
+// Tạo cá từ R_Fish.js
 fishTypes.forEach(type => {
     const image = new Image();
     image.src = `images/${type.image}`;
+
     image.onload = () => {
         for (let i = 0; i < type.mixin.maxNumGroup; i++) {
-            fishes.push(new createFish(type, image));
+            try {
+                const fish = new createFish(type, image);
+                fishes.push(fish);
+            } catch (error) {
+                console.error(`Error creating fish: ${error.message}`);
+            }
         }
     };
-});
 
-createCannon(currentCannonIndex); // Khởi tạo súng ban đầu
+    image.onerror = () => {
+        console.error(`Failed to load image for fish type: ${type.image}`);
+    };
+});
 
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Vẽ và cập nhật cá
     fishes.forEach(fish => {
         fish.move();
         fish.updateAnimation();
         fish.draw(ctx);
-    });
 
-    drawCannonsAndButtons(ctx); // Vẽ súng và các nút
+        // Giả lập chuyển sang trạng thái "capture" nếu x < 100 (chỉ để kiểm tra)
+        if (fish.x < 100 && fish.state !== "capture") {
+            fish.changeState("capture");
+        }
+
+        // Giả lập chuyển về trạng thái "swim" nếu x > 300
+        if (fish.x > 300 && fish.state !== "swim") {
+            fish.changeState("swim");
+        }
+    });
+    
+    drawCannonsAndButtons(ctx)
 
     requestAnimationFrame(gameLoop);
 }
 
 gameLoop();
 
-canvas.addEventListener("click", function (e) {
-    const { clientX, clientY } = e;
-
-    // Kiểm tra nếu súng bắn trúng cá
-    fishes.forEach(fish => {
-        // Kiểm tra nếu cá bị trúng đạn
-        if (1 == 2) {
-            // Cộng token cho người chơi
-            addToken(fish.mixin.coin);
-
-            // Cập nhật token của người chơi trong Firebase
-            updateUserBalance(userId, tokenBalance);
-
-            // Thay đổi trạng thái của cá sang "capture"
-            fish.changeState("capture");
-        }
-    });
-
-    // Kiểm tra nếu bắn vào nút chuyển đổi súng
-    // ... (code kiểm tra nút chuyển đổi súng)
+// Cập nhật lại kích thước của canvas khi thay đổi kích thước cửa sổ
+window.addEventListener("resize", function() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 });
-
-// Hàm cộng token
-function addToken(amount) {
-    // Cộng số token vào tài khoản người chơi
-    tokenBalance += amount;
-}
-
-// Cập nhật token vào Firebase
-function updateUserBalance(userId, balance) {
-    const userRef = firebase.database().ref('users/' + userId);
-    userRef.update({ balance: balance });
-}
-
-
-export {canvas, ctx}
