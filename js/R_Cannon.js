@@ -1,6 +1,6 @@
 // File: js/R_Cannon.js
 
-const cannonTypes = [
+export const cannonTypes = [
     {
         image: "cannon1.png",
         power: 1,
