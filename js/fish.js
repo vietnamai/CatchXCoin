@@ -1,9 +1,7 @@
 // File: js/fish.js
 
-import { fishTypes } from './R_Fish.js';  // Import dữ liệu cá từ R_Fish.js
-
-// Hàm tạo đối tượng cá
-export function createFish(type, spriteSheet) {
+// Hàm tạo đối tượng cá từ dữ liệu trong R_Fish.js
+function createFish(type, spriteSheet) {
     this.type = type;
     this.spriteSheet = spriteSheet;
 
@@ -33,12 +31,14 @@ export function createFish(type, spriteSheet) {
     this.state = "swim"; // Mặc định trạng thái là "swim"
 }
 
+// Hàm cập nhật hướng cá
 createFish.prototype.updateDirection = function () {
     const radian = this.rotation * (Math.PI / 180);
     this.speedX = Math.cos(radian) * this.speed;
     this.speedY = Math.sin(radian) * this.speed;
 };
 
+// Hàm di chuyển cá
 createFish.prototype.move = function () {
     this.x += this.speedX;
     this.y += this.speedY;
@@ -54,6 +54,7 @@ createFish.prototype.move = function () {
     }
 };
 
+// Hàm cập nhật hoạt ảnh cá
 createFish.prototype.updateAnimation = function () {
     this.delayCounter++;
     if (this.delayCounter >= this.frameDelay) {
@@ -62,6 +63,7 @@ createFish.prototype.updateAnimation = function () {
     }
 };
 
+// Hàm thay đổi trạng thái cá
 createFish.prototype.changeState = function (newState) {
     if (this.state !== newState) {
         this.state = newState;
@@ -81,17 +83,15 @@ createFish.prototype.changeState = function (newState) {
     }
 };
 
-createFish.prototype.draw = function (ctx) {
+// Hàm vẽ cá lên canvas
+createFish.prototype.getDrawInfo = function () {
     const { rect } = this.frames[this.currentFrame];
-    const [sx, sy, sWidth, sHeight] = rect;
-
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate((this.rotation * Math.PI) / 180);
-    ctx.drawImage(
-        this.spriteSheet,
-        sx, sy, sWidth, sHeight,
-        -sWidth / 2, -sHeight / 2, sWidth, sHeight
-    );
-    ctx.restore();
+    return { 
+        x: this.x,
+        y: this.y,
+        width: rect[2],
+        height: rect[3],
+        sx: rect[0],
+        sy: rect[1]
+    };
 };
