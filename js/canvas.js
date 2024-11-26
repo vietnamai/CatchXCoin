@@ -1,5 +1,8 @@
 // File: js/canvas.js
 
+import { createFish } from './fish.js';   // Import hàm tạo cá
+import { drawCannonsAndButtons } from './cannon.js'; // Import hàm vẽ súng và nút chuyển đổi
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -31,30 +34,25 @@ fishTypes.forEach(type => {
     };
 });
 
+// Hàm vòng lặp game
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Vẽ cá
     fishes.forEach(fish => {
         fish.move();
         fish.updateAnimation();
         fish.draw(ctx);
-
-        // Giả lập chuyển sang trạng thái "capture" nếu x < 100 (chỉ để kiểm tra)
-        if (fish.x < 100 && fish.state !== "capture") {
-            fish.changeState("capture");
-        }
-
-        // Giả lập chuyển về trạng thái "swim" nếu x > 300
-        if (fish.x > 300 && fish.state !== "swim") {
-            fish.changeState("swim");
-        }
     });
-    
-    drawCannonsAndButtons(ctx)
 
+    // Vẽ súng và các nút chuyển đổi
+    drawCannonsAndButtons(ctx);
+
+    // Tiếp tục vòng lặp game
     requestAnimationFrame(gameLoop);
 }
 
+// Khởi động vòng lặp game
 gameLoop();
 
 // Cập nhật lại kích thước của canvas khi thay đổi kích thước cửa sổ
