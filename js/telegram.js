@@ -1,35 +1,48 @@
 // File: js/telegram.js
 
-// Hàm xử lý và giao tiếp với Telegram Web App
-function initTelegram() {
-    if (typeof Telegram.WebApp === "undefined") {
-        console.error("Telegram Web App SDK is not available.");
-        return;
-    }
+/**
+ * Telegram module for handling user interactions and data
+ */
+const TelegramModule = (() => {
+    /**
+     * Khởi tạo và xử lý giao diện Web App của Telegram
+     */
+    const initialize = () => {
+        if (typeof Telegram.WebApp === "undefined") {
+            console.error("Telegram Web App SDK không khả dụng.");
+            return;
+        }
 
-    const tg = Telegram.WebApp;
+        const tg = Telegram.WebApp;
 
-    try {
-        const user = tg.initDataUnsafe.user;
-        const userId = user.id;
-        const firstName = user.first_name || "";
-        const lastName = user.last_name || "";
-        const username = user.username || "";
-        const avatar = user.photo_url || "";
+        try {
+            // Lấy thông tin người dùng từ Telegram
+            const user = tg.initDataUnsafe.user;
+            console.log("Thông tin người dùng:", user);
 
-        checkAndAddUser(userId, {
-            first_name: firstName,
-            last_name: lastName,
-            username: username,
-            avatar: avatar,
-        });
-    } catch (error) {
-        console.error("Error during Telegram WebApp initialization:", error);
-    }
-}
+            const userId = user.id;
+            const firstName = user.first_name || "";
+            const lastName = user.last_name || "";
+            const username = user.username || "";
+            const avatar = user.photo_url || ""; // URL ảnh đại diện
 
-// Lắng nghe sự kiện window.onload để đảm bảo mọi thứ đã sẵn sàng
-window.onload = function () {
-    console.log("Window loaded. Initializing Telegram Web App...");
-    initTelegram();
-};
+            // Gửi thông tin người dùng đến Firebase
+            FirebaseModule.checkAndAddUser(userId, {
+                first_name: firstName,
+                last_name: lastName,
+                username: username,
+                avatar: avatar,
+            });
+        } catch (error) {
+            console.error("Lỗi khi khởi tạo Telegram Web App:", error);
+        }
+    };
+
+    // Public API
+    return {
+        initialize
+    };
+})();
+
+// Khởi chạy Telegram Web App sau khi tải trang
+window.addEventListener("load", TelegramModule.initialize);
