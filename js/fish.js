@@ -4,7 +4,13 @@
 function createFish(type, spriteSheet) {
     this.type = type;
     this.spriteSheet = spriteSheet;
-    this.frames = getFishAnimation(type, "swim").frames; // Mặc định cá ở trạng thái bơi
+
+    // Lấy frames cho trạng thái "swim"
+    this.frames = type.frames.filter(frame => frame.label === "swim" || frame.jump === "swim");
+    if (this.frames.length === 0) {
+        throw new Error(`No "swim" frames found for fish type: ${type.image}`);
+    }
+
     this.currentFrame = 0;
     this.frameDelay = type.mixin.interval;
     this.delayCounter = 0;
@@ -20,53 +26,17 @@ function createFish(type, spriteSheet) {
 
     this.updateDirection();
     this.polyArea = type.polyArea.map(point => ({ x: point.x, y: point.y }));
+
+    // Trạng thái hiện tại
+    this.state = "swim"; // Mặc định trạng thái là "swim"
 }
 
-// Hàm lấy hoạt ảnh của cá theo trạng thái
-function getFishAnimation(type, state) {
-    const fish = fishTypes.find(f => f.image === type); // Lấy loại cá dựa vào tên file
-    if (!fish) {
-        console.error(`Fish type "${type}" not found.`);
-        return null;
-    }
-
-    // Chọn khung hình dựa trên trạng thái
-    const frames = fish.frames.filter(frame =>
-        state === "swim" ? (frame.label === "swim" || frame.jump === "swim") :
-        state === "capture" ? (frame.label === "capture" || frame.jump === "capture") : false
-    );
-
-    if (frames.length === 0) {
-        console.error(`No frames found for state "${state}" in fish type "${type}".`);
-        return null;
-    }
-
-    return {
-        image: fish.image,
-        frames: frames,
-        polyArea: fish.polyArea,
-        mixin: fish.mixin
-    };
-}
-
-// Cập nhật hướng di chuyển của cá
 createFish.prototype.updateDirection = function () {
     const radian = this.rotation * (Math.PI / 180);
     this.speedX = Math.cos(radian) * this.speed;
     this.speedY = Math.sin(radian) * this.speed;
 };
 
-// Cập nhật trạng thái cá
-createFish.prototype.updateAnimation = function (state) {
-    this.delayCounter++;
-    if (this.delayCounter >= this.frameDelay) {
-        this.frames = getFishAnimation(this.type, state).frames; // Cập nhật lại khung hình theo trạng thái
-        this.currentFrame = (this.currentFrame + 1) % this.frames.length;
-        this.delayCounter = 0;
-    }
-};
-
-// Cập nhật vị trí cá
 createFish.prototype.move = function () {
     this.x += this.speedX;
     this.y += this.speedY;
@@ -82,7 +52,33 @@ createFish.prototype.move = function () {
     }
 };
 
-// Vẽ cá lên canvas
+createFish.prototype.updateAnimation = function () {
+    this.delayCounter++;
+    if (this.delayCounter >= this.frameDelay) {
+        this.currentFrame = (this.currentFrame + 1) % this.frames.length;
+        this.delayCounter = 0;
+    }
+};
+
+createFish.prototype.changeState = function (newState) {
+    if (this.state !== newState) {
+        this.state = newState;
+
+        // Cập nhật frames theo trạng thái
+        this.frames = this.type.frames.filter(frame =>
+            newState === "swim" ? frame.label === "swim" || frame.jump === "swim" :
+            newState === "capture" ? frame.label === "capture" || frame.jump === "capture" : false
+        );
+
+        if (this.frames.length === 0) {
+            console.error(`No frames found for state "${newState}" in fish type "${this.type.image}"`);
+            return;
+        }
+
+        this.currentFrame = 0; // Reset khung hình về đầu
+    }
+};
+
 createFish.prototype.draw = function (ctx) {
     const { rect } = this.frames[this.currentFrame];
     const [sx, sy, sWidth, sHeight] = rect;
