@@ -111,5 +111,22 @@ var fishTypes = [
         ],
         polyArea: [{ x: 15, y: 5 }, { x: 85, y: 5 }, { x: 85, y: 80 }, { x: 15, y: 80 }],
         mixin: { coin: 30, captureRate: 0.25, maxNumGroup: 5, minSpeed: 0.5, maxSpeed: 0.8, regX: 40, regY: 50, interval: 10 }
+    },
+    {
+        image: "fish8.png",
+        frames: [
+            { rect: [0, 0, 92, 151], label: "swim" },
+            { rect: [0, 151, 92, 151] },
+            { rect: [0, 302, 92, 151] },
+            { rect: [0, 453, 92, 151] },
+            { rect: [0, 604, 92, 151] },
+            { rect: [0, 755, 92, 151], jump: "swim" },
+            { rect: [0, 906, 92, 151], label: "capture" },
+            { rect: [0, 1057, 92, 151] },
+            { rect: [0, 1208, 92, 151] },
+            { rect: [0, 1359, 92, 151], jump: "capture" }
+        ],
+        polyArea: [{ x: 15, y: 5 }, { x: 85, y: 5 }, { x: 85, y: 80 }, { x: 15, y: 80 }],
+        mixin: { coin: 30, captureRate: 0.25, maxNumGroup: 5, minSpeed: 0.5, maxSpeed: 0.8, regX: 40, regY: 50, interval: 10 }
     }
-];;
+];
