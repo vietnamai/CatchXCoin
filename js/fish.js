@@ -33,24 +33,23 @@ function createFish(type, spriteSheet) {
 
 // Hàm cập nhật hướng cá
 createFish.prototype.updateDirection = function () {
-    const radian = this.rotation * (Math.PI / 180);
-    this.speedX = Math.cos(radian) * this.speed;
-    this.speedY = Math.sin(radian) * this.speed;
+    // Lấy góc từ vị trí hiện tại (x, y) đến vị trí mục tiêu (nextX, nextY)
+    const angle = Math.atan2(this.speedY, this.speedX); // Tính góc hướng đi của cá từ vị trí hiện tại
+    this.rotation = angle * 180 / Math.PI;  // Convert từ radian sang độ
+    this.speedX = Math.cos(angle) * this.speed; // Tính lại tốc độ theo chiều X
+    this.speedY = Math.sin(angle) * this.speed; // Tính lại tốc độ theo chiều Y
 };
 
-// Hàm di chuyển cá
 createFish.prototype.move = function () {
-    this.x += this.speedX;
-    this.y += this.speedY;
+    this.x += this.speedX;  // Cập nhật vị trí X
+    this.y += this.speedY;  // Cập nhật vị trí Y
 
-    // Kiểm tra nếu cá chạm biên
+    // Kiểm tra nếu cá chạm vào biên và quay lại
     if (this.x < 0 || this.x > window.innerWidth) {
-        this.rotation = 180 - this.rotation;
-        this.updateDirection();
+        this.speedX = -this.speedX; // Lật ngược hướng di chuyển theo chiều X
     }
     if (this.y < 0 || this.y > window.innerHeight) {
-        this.rotation = 360 - this.rotation;
-        this.updateDirection();
+        this.speedY = -this.speedY; // Lật ngược hướng di chuyển theo chiều Y
     }
 };
 
