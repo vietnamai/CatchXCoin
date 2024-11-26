@@ -1,1 +1,1 @@
-console.log("this is a antiFraud file 1")
+console.log("this is a antiFraud file")
