@@ -44,7 +44,7 @@ canvas.addEventListener("click", function (e) {
     // Kiểm tra nếu súng bắn trúng cá
     fishes.forEach(fish => {
         // Kiểm tra nếu cá bị trúng đạn
-        if (/* điều kiện trúng đạn */) {
+        if (1 == 2) {
             // Cộng token cho người chơi
             addToken(fish.mixin.coin);
 
