@@ -17,8 +17,17 @@ fishTypes.forEach(type => {
 
     image.onload = () => {
         for (let i = 0; i < type.mixin.maxNumGroup; i++) {
-            fishes.push(new createFish(type, image));
+            try {
+                const fish = new createFish(type, image);
+                fishes.push(fish);
+            } catch (error) {
+                console.error(`Error creating fish: ${error.message}`);
+            }
         }
+    };
+
+    image.onerror = () => {
+        console.error(`Failed to load image for fish type: ${type.image}`);
     };
 });
 
@@ -29,6 +38,16 @@ function gameLoop() {
         fish.move();
         fish.updateAnimation();
         fish.draw(ctx);
+
+        // Giả lập chuyển sang trạng thái "capture" nếu x < 100 (chỉ để kiểm tra)
+        if (fish.x < 100 && fish.state !== "capture") {
+            fish.changeState("capture");
+        }
+
+        // Giả lập chuyển về trạng thái "swim" nếu x > 300
+        if (fish.x > 300 && fish.state !== "swim") {
+            fish.changeState("swim");
+        }
     });
 
     requestAnimationFrame(gameLoop);
