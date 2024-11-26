@@ -1,11 +1,9 @@
 // File: js/fish.js
 
-// Hàm tạo đối tượng cá từ dữ liệu trong R_Fish.js
 function createFish(type, spriteSheet) {
     this.type = type;
     this.spriteSheet = spriteSheet;
 
-    // Lấy frames cho trạng thái "swim"
     this.frames = type.frames.filter(frame => frame.label === "swim" || frame.jump === "swim");
     if (this.frames.length === 0) {
         throw new Error(`No "swim" frames found for fish type: ${type.image}`);
@@ -24,36 +22,33 @@ function createFish(type, spriteSheet) {
     this.rotation = Math.random() * 360;
     this.speed = Math.random() * (type.mixin.maxSpeed - type.mixin.minSpeed) + type.mixin.minSpeed;
 
-    this.updateDirection();
+    this.updateDirection(); // Tạo hướng di chuyển ban đầu
     this.polyArea = type.polyArea.map(point => ({ x: point.x, y: point.y }));
 
-    // Trạng thái hiện tại
-    this.state = "swim"; // Mặc định trạng thái là "swim"
+    this.state = "swim"; // Trạng thái mặc định của cá
 }
 
-// Hàm cập nhật hướng cá
+// Thêm các phương thức vào prototype của `createFish`
 createFish.prototype.updateDirection = function () {
-    // Lấy góc từ vị trí hiện tại (x, y) đến vị trí mục tiêu (nextX, nextY)
-    const angle = Math.atan2(this.speedY, this.speedX); // Tính góc hướng đi của cá từ vị trí hiện tại
-    this.rotation = angle * 180 / Math.PI;  // Convert từ radian sang độ
-    this.speedX = Math.cos(angle) * this.speed; // Tính lại tốc độ theo chiều X
-    this.speedY = Math.sin(angle) * this.speed; // Tính lại tốc độ theo chiều Y
+    const angle = Math.random() * Math.PI * 2;
+    this.speedX = Math.cos(angle) * this.speed;
+    this.speedY = Math.sin(angle) * this.speed;
+    this.rotation = angle * (180 / Math.PI);
 };
 
 createFish.prototype.move = function () {
-    this.x += this.speedX;  // Cập nhật vị trí X
-    this.y += this.speedY;  // Cập nhật vị trí Y
+    this.x += this.speedX;
+    this.y += this.speedY;
 
-    // Kiểm tra nếu cá chạm vào biên và quay lại
+    // Đổi hướng nếu chạm biên
     if (this.x < 0 || this.x > window.innerWidth) {
-        this.speedX = -this.speedX; // Lật ngược hướng di chuyển theo chiều X
+        this.speedX = -this.speedX;
     }
     if (this.y < 0 || this.y > window.innerHeight) {
-        this.speedY = -this.speedY; // Lật ngược hướng di chuyển theo chiều Y
+        this.speedY = -this.speedY;
     }
 };
 
-// Hàm cập nhật hoạt ảnh cá
 createFish.prototype.updateAnimation = function () {
     this.delayCounter++;
     if (this.delayCounter >= this.frameDelay) {
@@ -62,35 +57,17 @@ createFish.prototype.updateAnimation = function () {
     }
 };
 
-// Hàm thay đổi trạng thái cá
-createFish.prototype.changeState = function (newState) {
-    if (this.state !== newState) {
-        this.state = newState;
-
-        // Cập nhật frames theo trạng thái
-        this.frames = this.type.frames.filter(frame =>
-            newState === "swim" ? frame.label === "swim" || frame.jump === "swim" :
-            newState === "capture" ? frame.label === "capture" || frame.jump === "capture" : false
-        );
-
-        if (this.frames.length === 0) {
-            console.error(`No frames found for state "${newState}" in fish type "${this.type.image}"`);
-            return;
-        }
-
-        this.currentFrame = 0; // Reset khung hình về đầu
-    }
-};
-
-// Hàm vẽ cá lên canvas
-createFish.prototype.getDrawInfo = function () {
+createFish.prototype.draw = function (ctx) {
     const { rect } = this.frames[this.currentFrame];
-    return { 
-        x: this.x,
-        y: this.y,
-        width: rect[2],
-        height: rect[3],
-        sx: rect[0],
-        sy: rect[1]
-    };
+    const [sx, sy, sWidth, sHeight] = rect;
+
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate((this.rotation * Math.PI) / 180);
+    ctx.drawImage(
+        this.spriteSheet,
+        sx, sy, sWidth, sHeight,
+        -sWidth / 2, -sHeight / 2, sWidth, sHeight
+    );
+    ctx.restore();
 };
