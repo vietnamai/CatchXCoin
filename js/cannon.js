@@ -1,6 +1,7 @@
 // File: js/cannon.js
 
 import { cannonTypes } from './R_Cannon.js'; // Import dữ liệu súng từ R_Cannon.js
+import { canvas } from './canvas.js';
 
 let currentCannonIndex = 0; // Vị trí súng hiện tại
 let currentCannon = null;
