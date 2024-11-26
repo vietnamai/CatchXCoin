@@ -21,7 +21,7 @@ function createFish(type, spriteSheet) {
 
     this.x = Math.random() * window.innerWidth;
     this.y = Math.random() * window.innerHeight;
-    this.rotation = Math.random() * 360;
+    this.rotation = Math.random() * 360; // Lấy một góc quay ngẫu nhiên
     this.speed = Math.random() * (type.mixin.maxSpeed - type.mixin.minSpeed) + type.mixin.minSpeed;
 
     this.updateDirection();
