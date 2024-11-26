@@ -14,24 +14,27 @@ function createCannon(index) {
     const cannonImage = new Image();
     cannonImage.src = `images/${cannonConfig.image}`;
 
-    cannonImage.onload = () => {
-        // Tạo đối tượng súng sau khi hình ảnh đã tải
-        currentCannon = {
-            type: index + 1, // Loại súng (1-7)
-            power: cannonConfig.power,
-            image: cannonImage,
-            frames: cannonConfig.frames,
-            bullet: cannonConfig.bullet,
-            x: window.innerWidth / 2,
-            y: window.innerHeight - 100,
-            rotation: 0
+    // Dùng promise để đợi hình ảnh tải xong
+    return new Promise((resolve, reject) => {
+        cannonImage.onload = () => {
+            // Tạo đối tượng súng sau khi hình ảnh đã tải
+            currentCannon = {
+                type: index + 1, // Loại súng (1-7)
+                power: cannonConfig.power,
+                image: cannonImage,
+                frames: cannonConfig.frames,
+                bullet: cannonConfig.bullet,
+                x: window.innerWidth / 2,
+                y: window.innerHeight - 100,
+                rotation: 0
+            };
+            resolve(); // Sau khi tạo súng thành công, resolve promise
         };
-    };
 
-    // Cập nhật lại nút chuyển đổi súng sau khi ảnh tải
-    if (currentCannon !== null) {
-        drawCannonsAndButtons(ctx); // Vẽ súng và nút chuyển đổi
-    }
+        cannonImage.onerror = () => {
+            reject(new Error(`Failed to load cannon image: ${cannonConfig.image}`)); // Bắt lỗi nếu không tải được hình
+        };
+    });
 }
 
 // Vẽ súng lên canvas
@@ -93,7 +96,11 @@ canvas.addEventListener("mousemove", function (e) {
 });
 
 // Khởi tạo súng ban đầu
-createCannon(currentCannonIndex);
+createCannon(currentCannonIndex).then(() => {
+    console.log("Cannon initialized successfully.");
+}).catch(error => {
+    console.error("Error initializing cannon:", error);
+});
 
 // Vẽ nút chuyển đổi súng
 function drawButtons(ctx) {
