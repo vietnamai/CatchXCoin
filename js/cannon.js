@@ -1,5 +1,5 @@
 // File: js/cannon.js
-
+import {canvas, ctx} from "/canvas.js"
 // Lấy dữ liệu từ R_Cannon.js
 let currentCannonIndex = 0; // Vị trí súng hiện tại
 let currentCannon = null;
