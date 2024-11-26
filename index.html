@@ -7,26 +7,31 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    
     <canvas id="gameCanvas"></canvas>
 
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics-compat.js"></script>
+
+    <!-- Telegram SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
+    <!-- Game Logic Files -->
     <script src="js/background.js"></script>
     <script src="js/firebase.js"></script>
     <script src="js/telegram.js"></script>
     <script src="js/antiFraud.js"></script>
     
+    <!-- Fish Game Files -->
     <script src="js/R_Fish.js"></script>
     <script src="js/fish.js"></script>
 
+    <!-- Cannon Game Files -->
     <script src="js/R_Cannon.js"></script>
-    <script type="module" src="js/cannon.js"></script>
-    
-    <script type="module" src="js/canvas.js"></script>
-    
+    <script src="js/cannon.js"></script>
+
+    <!-- Main Game Canvas Logic -->
+    <script src="js/canvas.js"></script>
 </body>
 </html>
