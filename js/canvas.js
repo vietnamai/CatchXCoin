@@ -50,6 +50,8 @@ function gameLoop() {
         }
     });
 
+    drawCannonsAndButtons(ctx)
+
     requestAnimationFrame(gameLoop);
 }
 
