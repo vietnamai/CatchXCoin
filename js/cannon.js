@@ -3,8 +3,9 @@
 import { cannonTypes } from './R_Cannon.js'; // Import dữ liệu súng từ R_Cannon.js
 import { canvas } from './canvas.js';
 
+
 let currentCannonIndex = 0; // Vị trí súng hiện tại
-let currentCannon = null;
+let currentCannon = null; // Khởi tạo biến currentCannon là null
 
 // Hàm khởi tạo súng từ R_Cannon.js
 function createCannon(index) {
@@ -14,6 +15,7 @@ function createCannon(index) {
     cannonImage.src = `images/${cannonConfig.image}`;
 
     cannonImage.onload = () => {
+        // Tạo đối tượng súng sau khi hình ảnh đã tải
         currentCannon = {
             type: index + 1, // Loại súng (1-7)
             power: cannonConfig.power,
@@ -25,6 +27,11 @@ function createCannon(index) {
             rotation: 0
         };
     };
+
+    // Cập nhật lại nút chuyển đổi súng sau khi ảnh tải
+    if (currentCannon !== null) {
+        drawCannonsAndButtons(ctx); // Vẽ súng và nút chuyển đổi
+    }
 }
 
 // Vẽ súng lên canvas
@@ -97,6 +104,8 @@ function drawButtons(ctx) {
 
 // Cập nhật vòng lặp game
 export function drawCannonsAndButtons(ctx) {
-    drawCannon(ctx); // Vẽ súng
+    if (currentCannon !== null) {
+        drawCannon(ctx); // Vẽ súng
+    }
     drawButtons(ctx); // Vẽ nút chuyển đổi
 }
