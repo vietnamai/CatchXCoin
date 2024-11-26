@@ -1,17 +1,13 @@
 // File: js/canvas.js
 
-import { createFish } from './fish.js';   // Import hàm tạo cá
-import { drawCannonsAndButtons } from './cannon.js'; // Import hàm vẽ súng và nút chuyển đổi
-import { fishTypes } from './R_Fish.js';
-
-export const canvas = document.getElementById("gameCanvas");
+const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 // Set kích thước canvas
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// Mảng lưu cá
+// Mảng lưu các đối tượng cá
 const fishes = [];
 
 // Tạo cá từ R_Fish.js
@@ -22,8 +18,9 @@ fishTypes.forEach(type => {
     image.onload = () => {
         for (let i = 0; i < type.mixin.maxNumGroup; i++) {
             try {
+                // Tạo đối tượng cá mới từ thông số trong R_Fish.js
                 const fish = new createFish(type, image);
-                fishes.push(fish);
+                fishes.push(fish);  // Thêm cá vào mảng
             } catch (error) {
                 console.error(`Error creating fish: ${error.message}`);
             }
@@ -37,24 +34,25 @@ fishTypes.forEach(type => {
 
 // Hàm vòng lặp game
 function gameLoop() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);  // Xóa canvas trước khi vẽ lại
 
-    // Vẽ cá
+    // Cập nhật và vẽ tất cả các con cá
     fishes.forEach(fish => {
-        fish.move();
-        fish.updateAnimation();
-        fish.draw(ctx);
+        fish.move();  // Di chuyển cá
+        fish.updateAnimation();  // Cập nhật hoạt ảnh của cá
+        
+        // Lấy thông tin vẽ từ cá và vẽ lên canvas
+        const drawInfo = fish.getDrawInfo();
+        ctx.save();
+        ctx.translate(drawInfo.x, drawInfo.y);
+        ctx.drawImage(fish.spriteSheet, drawInfo.sx, drawInfo.sy, drawInfo.width, drawInfo.height, -drawInfo.width / 2, -drawInfo.height / 2, drawInfo.width, drawInfo.height);
+        ctx.restore();
     });
 
-    // Vẽ súng và các nút chuyển đổi
-    drawCannonsAndButtons(ctx);
-
-    // Tiếp tục vòng lặp game
-    requestAnimationFrame(gameLoop);
+    requestAnimationFrame(gameLoop);  // Gọi gameLoop tiếp để tiếp tục vòng lặp
 }
 
-// Khởi động vòng lặp game
-gameLoop();
+gameLoop();  // Bắt đầu vòng lặp game
 
 // Cập nhật lại kích thước của canvas khi thay đổi kích thước cửa sổ
 window.addEventListener("resize", function() {
