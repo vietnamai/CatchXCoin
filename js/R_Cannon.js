@@ -10,7 +10,8 @@ const cannonTypes = [
             { rect: [148, 0, 74, 74] },
             { rect: [222, 0, 74, 74], jump: "default" }
         ],
-        bullet: "bullet1.png"
+        bullet: "bullet1.png",
+        bulletCost: 1
     },
     {
         image: "cannon2.png",
@@ -21,7 +22,8 @@ const cannonTypes = [
             { rect: [148, 0, 74, 76] },
             { rect: [222, 0, 74, 76], jump: "default" }
         ],
-        bullet: "bullet2.png"
+        bullet: "bullet2.png",
+        bulletCost: 2
     },
     {
         image: "cannon3.png",
@@ -32,7 +34,8 @@ const cannonTypes = [
             { rect: [148, 0, 74, 76] },
             { rect: [222, 0, 74, 76], jump: "default" }
         ],
-        bullet: "bullet3.png"
+        bullet: "bullet3.png",
+        bulletCost: 3  
     },
     {
         image: "cannon4.png",
@@ -43,7 +46,8 @@ const cannonTypes = [
             { rect: [148, 0, 74, 83] },
             { rect: [222, 0, 74, 83], jump: "default" }
         ],
-        bullet: "bullet4.png"
+        bullet: "bullet4.png",
+        bulletCost: 4
     },
     {
         image: "cannon5.png",
@@ -54,7 +58,8 @@ const cannonTypes = [
             { rect: [148, 0, 74, 85] },
             { rect: [222, 0, 74, 85], jump: "default" }
         ],
-        bullet: "bullet5.png"
+        bullet: "bullet5.png",
+        bulletCost: 5
     },
     {
         image: "cannon6.png",
@@ -65,7 +70,8 @@ const cannonTypes = [
             { rect: [148, 0, 74, 90] },
             { rect: [222, 0, 74, 90], jump: "default" }
         ],
-        bullet: "bullet6.png"
+        bullet: "bullet6.png",
+        bulletCost: 6
     },
     {
         image: "cannon7.png",
@@ -76,6 +82,7 @@ const cannonTypes = [
             { rect: [148, 0, 74, 94] },
             { rect: [222, 0, 74, 94], jump: "default" }
         ],
-        bullet: "bullet7.png"
+        bullet: "bullet7.png",
+        bulletCost: 7
     }
 ];
