@@ -1,60 +1,86 @@
 // File: js/firebase.js
 
-let app, db; // Biến toàn cục để lưu trữ Firebase App và Database
+/**
+ * Firebase module for managing user data and interactions
+ */
+const Firebase = (() => {
+    let app, db; // Biến toàn cục để lưu trữ Firebase App và Database
 
-try {
-    const firebaseConfig = {
-        apiKey: "AIzaSyCOHdI4tVObleAkiuIUymMBNEz3OPue-7Y",
-        authDomain: "catchxcoin.firebaseapp.com",
-        projectId: "catchxcoin",
-        storageBucket: "catchxcoin.firebasestorage.app",
-        messagingSenderId: "1044694743228",
-        appId: "1:1044694743228:web:a50528274809fc880178b9",
-        measurementId: "G-3HL2PJ5SRD",
-        databaseURL: "https://catchxcoin-default-rtdb.asia-southeast1.firebasedatabase.app/"
+    try {
+        // Cấu hình Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCOHdI4tVObleAkiuIUymMBNEz3OPue-7Y",
+            authDomain: "catchxcoin.firebaseapp.com",
+            projectId: "catchxcoin",
+            storageBucket: "catchxcoin.firebasestorage.app",
+            messagingSenderId: "1044694743228",
+            appId: "1:1044694743228:web:a50528274809fc880178b9",
+            measurementId: "G-3HL2PJ5SRD",
+            databaseURL: "https://catchxcoin-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        };
+
+        console.log("Initializing Firebase...");
+        app = firebase.initializeApp(firebaseConfig); // Khởi tạo Firebase
+        db = firebase.database(); // Kết nối tới Realtime Database
+        console.log("Firebase initialized successfully.");
+    } catch (error) {
+        console.error("Error initializing Firebase:", error);
+    }
+
+    /**
+     * Kiểm tra và thêm người dùng vào Firebase nếu chưa tồn tại
+     * @param {string} userId - ID người dùng Telegram
+     * @param {object} userInfo - Thông tin người dùng (first_name, last_name, username, avatar)
+     */
+    const checkAndAddUser = (userId, userInfo) => {
+        const userRef = db.ref(`users/${userId}`);
+
+        userRef.once("value")
+            .then((snapshot) => {
+                if (!snapshot.exists()) {
+                    console.log(`User ${userId} does not exist. Adding to Firebase...`);
+
+                    return userRef.set({
+                        first_name: userInfo.first_name,
+                        last_name: userInfo.last_name,
+                        username: userInfo.username,
+                        avatar: userInfo.avatar, // Lưu ảnh đại diện người dùng
+                        balance: 0 // Khởi tạo balance ban đầu
+                    });
+                } else {
+                    console.log(`User ${userId} already exists in Firebase.`);
+                }
+            })
+            .then(() => {
+                console.log(`User ${userId} added/verified successfully.`);
+            })
+            .catch((error) => {
+                console.error("Error handling user data in Firebase:", error);
+            });
     };
 
-    app = firebase.initializeApp(firebaseConfig); // Khởi tạo Firebase với cấu hình
-    db = firebase.database(); // Kết nối tới Realtime Database
+    /**
+     * Cập nhật số dư token cho người dùng
+     * @param {string} userId - ID người dùng Telegram
+     * @param {number} amount - Số lượng token cần cộng hoặc trừ
+     */
+    const updateUserBalance = (userId, amount) => {
+        const userRef = db.ref(`users/${userId}/balance`);
 
-} catch (error) {
-    console.error("Error initializing Firebase:", error);
-}
-
-// Cập nhật số dư token của người dùng
-function updateUserBalance(userId, balance) {
-    const userRef = db.ref('users/' + userId);
-    userRef.update({
-        balance: balance
-    }).then(() => {
-        console.log(`User ${userId} balance updated to ${balance}`);
-    }).catch((error) => {
-        console.error(`Error updating user ${userId} balance:`, error);
-    });
-}
-
-// Kiểm tra và thêm người dùng vào Firebase nếu chưa tồn tại
-function checkAndAddUser(userId, userInfo) {
-    const userRef = db.ref('users/' + userId);
-
-    userRef.once('value', (snapshot) => {
-        if (!snapshot.exists()) {
-            console.log(`User ${userId} does not exist. Adding to Firebase...`);
-            userRef.set({
-                first_name: userInfo.first_name,
-                last_name: userInfo.last_name,
-                username: userInfo.username,
-                avatar: userInfo.avatar,
-                balance: 0, // Khởi tạo balance ban đầu cho người dùng
-            }).then(() => {
-                console.log(`User ${userId} added to Firebase with details.`);
-            }).catch((error) => {
-                console.error(`Error adding user ${userId} to Firebase:`, error);
+        userRef.transaction((currentBalance) => {
+            return (currentBalance || 0) + amount;
+        })
+            .then(() => {
+                console.log(`User ${userId} balance updated successfully by ${amount}.`);
+            })
+            .catch((error) => {
+                console.error("Error updating user balance:", error);
             });
-        } else {
-            console.log(`User ${userId} already exists in Firebase.`);
-        }
-    }).catch((error) => {
-        console.error("Error checking user existence:", error);
-    });
-}
+    };
+
+    // Public API
+    return {
+        checkAndAddUser,
+        updateUserBalance
+    };
+})();
