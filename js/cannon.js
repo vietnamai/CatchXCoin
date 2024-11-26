@@ -96,7 +96,7 @@ function drawButtons(ctx) {
 }
 
 // Cập nhật vòng lặp game
-function drawCannonsAndButtons(ctx) {
+export function drawCannonsAndButtons(ctx) {
     drawCannon(ctx); // Vẽ súng
     drawButtons(ctx); // Vẽ nút chuyển đổi
 }
