@@ -3,7 +3,7 @@
 import { createFish } from './fish.js';   // Import hàm tạo cá
 import { drawCannonsAndButtons } from './cannon.js'; // Import hàm vẽ súng và nút chuyển đổi
 
-const canvas = document.getElementById("gameCanvas");
+export const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 // Set kích thước canvas
