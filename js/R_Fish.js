@@ -1,6 +1,6 @@
 // File: js/R_Fish.js
 
-var fishTypes = [
+export const fishTypes = [
     {
         image: "fish1.png",
         frames: [
