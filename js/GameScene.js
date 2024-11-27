@@ -1,141 +1,126 @@
 // File: js/GameScene.js
-
-import { cannonTypes } from './R_Cannon.js'; // Import thông số súng từ R_Cannon.js
-import { fishTypes } from './R_Fish.js'; // Import thông số cá từ R_Fish.js
+import Phaser from 'phaser';
+import { fishTypes } from './R_Fish.js';
+import { cannonTypes } from './R_Cannon.js';
 
 export class GameScene extends Phaser.Scene {
     constructor() {
-        super("GameScene");
+        super({ key: 'GameScene' });
+        this.fishes = [];
+        this.cannon = null;
+        this.currentCannonIndex = 0;
+        this.bullets = [];
     }
 
     preload() {
-        // Tải các hình ảnh cần thiết (súng, cá và đạn)
-        cannonTypes.forEach(cannon => {
-            this.load.image(cannon.image, `images/${cannon.image}`);
-        });
+        // Load fish images
         fishTypes.forEach(fish => {
-            this.load.image(fish.image, `images/${fish.image}`);
+            this.load.spritesheet(fish.image, `images/${fish.image}`, {
+                frameWidth: fish.frames[0].rect[2],
+                frameHeight: fish.frames[0].rect[3]
+            });
+        });
+
+        // Load cannon images
+        cannonTypes.forEach(cannon => {
+            this.load.spritesheet(cannon.image, `images/${cannon.image}`, {
+                frameWidth: cannon.frames[0].rect[2],
+                frameHeight: cannon.frames[0].rect[3]
+            });
+            this.load.image(cannon.bullet, `images/${cannon.bullet}`);
         });
     }
 
     create() {
-        // Tạo cá và súng từ các thông số trong R_Fish.js và R_Cannon.js
-        this.fishes = [];
-        fishTypes.forEach(type => {
-            for (let i = 0; i < type.mixin.maxNumGroup; i++) {
-                const fish = new createFish(type, this.cache.images.get(type.image)); // Sử dụng hình ảnh đã tải
+        // Add fishes
+        fishTypes.forEach(fishType => {
+            for (let i = 0; i < fishType.mixin.maxNumGroup; i++) {
+                const fish = this.add.sprite(
+                    Phaser.Math.Between(0, this.sys.canvas.width),
+                    Phaser.Math.Between(0, this.sys.canvas.height),
+                    fishType.image
+                );
+                fish.type = fishType;
+                fish.play('swim');
                 this.fishes.push(fish);
             }
         });
 
-        // Khởi tạo súng
-        this.currentCannon = cannonTypes[0]; // Chọn súng đầu tiên
-        this.cannonSprite = this.add.sprite(window.innerWidth / 2, window.innerHeight - 100, this.currentCannon.image);
-        this.cannonSprite.setOrigin(0.5, 0.5);
+        // Add cannon
+        this.addCannon();
+
+        // Input events
+        this.input.on('pointermove', this.aimCannon, this);
+        this.input.on('pointerdown', this.shootBullet, this);
     }
 
     update() {
-        // Cập nhật chuyển động cá
-        this.fishes.forEach(fish => {
-            fish.move();
-            fish.updateAnimation();
+        this.updateFishes();
+        this.updateBullets();
+    }
+
+    addCannon() {
+        const cannonConfig = cannonTypes[this.currentCannonIndex];
+        this.cannon = this.add.sprite(
+            this.sys.canvas.width / 2,
+            this.sys.canvas.height - 50,
+            cannonConfig.image
+        );
+        this.cannon.setOrigin(0.5, 0.5);
+        this.cannon.rotation = -Math.PI / 2; // Default pointing upwards
+    }
+
+    aimCannon(pointer) {
+        if (!this.cannon) return;
+
+        const dx = pointer.worldX - this.cannon.x;
+        const dy = pointer.worldY - this.cannon.y;
+        this.cannon.rotation = Math.atan2(dy, dx);
+    }
+
+    shootBullet() {
+        if (!this.cannon) return;
+
+        const cannonConfig = cannonTypes[this.currentCannonIndex];
+        const bullet = this.add.sprite(this.cannon.x, this.cannon.y, cannonConfig.bullet);
+
+        const angle = this.cannon.rotation;
+        bullet.setData('velocity', {
+            x: Math.cos(angle) * 300,
+            y: Math.sin(angle) * 300
         });
 
-        // Cập nhật chuyển động súng
-        this.updateCannon();
-
-        // Kiểm tra bắn súng
-        if (this.input.activePointer.isDown) {
-            this.fireCannon();
-        }
+        this.bullets.push(bullet);
     }
 
-    updateCannon() {
-        const pointer = this.input.activePointer;
-
-        // Quay súng theo hướng của chuột
-        const dx = pointer.x - this.cannonSprite.x;
-        const dy = pointer.y - this.cannonSprite.y;
-        const angle = Math.atan2(dy, dx);
-        this.cannonSprite.rotation = angle;
+    updateFishes() {
+        this.fishes.forEach(fish => {
+            const fishType = fish.type;
+            fish.x += fishType.mixin.minSpeed;
+            if (fish.x > this.sys.canvas.width) {
+                fish.x = 0; // Wrap fish around the screen
+            }
+        });
     }
 
-    fireCannon() {
-        // Tạo đạn từ thông số súng
-        const bullet = this.add.sprite(this.cannonSprite.x, this.cannonSprite.y, this.currentCannon.bullet);
-        const speed = this.currentCannon.power * 10; // Tốc độ đạn tùy thuộc vào sức mạnh súng
+    updateBullets() {
+        this.bullets.forEach(bullet => {
+            const velocity = bullet.getData('velocity');
+            bullet.x += velocity.x * this.game.loop.delta / 1000;
+            bullet.y += velocity.y * this.game.loop.delta / 1000;
 
-        this.physics.moveTo(bullet, this.input.activePointer.x, this.input.activePointer.y, speed);
+            // Remove bullet if out of bounds
+            if (
+                bullet.x < 0 ||
+                bullet.x > this.sys.canvas.width ||
+                bullet.y < 0 ||
+                bullet.y > this.sys.canvas.height
+            ) {
+                bullet.destroy();
+            }
+        });
+
+        // Cleanup destroyed bullets
+        this.bullets = this.bullets.filter(bullet => bullet.active);
     }
 }
-
-function createFish(type, spriteSheet) {
-    this.type = type;
-    this.spriteSheet = spriteSheet;
-    this.frames = type.frames.filter(frame => frame.label === "swim" || frame.jump === "swim");
-    if (this.frames.length === 0) {
-        throw new Error(`No "swim" frames found for fish type: ${type.image}`);
-    }
-
-    this.currentFrame = 0;
-    this.frameDelay = type.mixin.interval;
-    this.delayCounter = 0;
-
-    const { rect } = this.frames[0];
-    this.frameWidth = rect[2];
-    this.frameHeight = rect[3];
-
-    this.x = Math.random() * window.innerWidth;
-    this.y = Math.random() * window.innerHeight;
-    this.rotation = Math.random() * 360;
-    this.speed = Math.random() * (type.mixin.maxSpeed - type.mixin.minSpeed) + type.mixin.minSpeed;
-
-    this.updateDirection();
-    this.polyArea = type.polyArea.map(point => ({ x: point.x, y: point.y }));
-
-    this.state = "swim"; // Trạng thái ban đầu là "swim"
-}
-
-createFish.prototype.updateDirection = function () {
-    const radian = this.rotation * (Math.PI / 180);
-    this.speedX = Math.cos(radian) * this.speed;
-    this.speedY = Math.sin(radian) * this.speed;
-};
-
-createFish.prototype.move = function () {
-    this.x += this.speedX;
-    this.y += this.speedY;
-
-    // Kiểm tra nếu cá chạm biên
-    if (this.x < 0 || this.x > window.innerWidth) {
-        this.rotation = 180 - this.rotation;
-        this.updateDirection();
-    }
-    if (this.y < 0 || this.y > window.innerHeight) {
-        this.rotation = 360 - this.rotation;
-        this.updateDirection();
-    }
-};
-
-createFish.prototype.updateAnimation = function () {
-    this.delayCounter++;
-    if (this.delayCounter >= this.frameDelay) {
-        this.currentFrame = (this.currentFrame + 1) % this.frames.length;
-        this.delayCounter = 0;
-    }
-};
-
-createFish.prototype.draw = function (ctx) {
-    const { rect } = this.frames[this.currentFrame];
-    const [sx, sy, sWidth, sHeight] = rect;
-
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate((this.rotation * Math.PI) / 180);
-    ctx.drawImage(
-        this.spriteSheet,
-        sx, sy, sWidth, sHeight,
-        -sWidth / 2, -sHeight / 2, sWidth, sHeight
-    );
-    ctx.restore();
-};
