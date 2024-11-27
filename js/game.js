@@ -1,113 +1,90 @@
-const fishTypes = [
-    {
-        image: "assets/fish1.png",
-        frames: [
-            { rect: [0, 0, 55, 37], label: "swim" },
-            { rect: [0, 37, 55, 37] },
-            { rect: [0, 74, 55, 37] },
-            { rect: [0, 111, 55, 37], jump: "swim" },
-            { rect: [0, 148, 55, 37], label: "capture" },
-            { rect: [0, 185, 55, 37] },
-            { rect: [0, 222, 55, 37] },
-            { rect: [0, 259, 55, 37], jump: "capture" }
-        ],
-        polyArea: [{ x: 10, y: 5 }, { x: 55, y: 5 }, { x: 55, y: 22 }, { x: 10, y: 22 }],
-        mixin: { coin: 1, captureRate: 0.55, maxNumGroup: 8, minSpeed: 0.5, maxSpeed: 1.2, regX: 35, regY: 12, interval: 10 }
-    },
-    {
-        image: "assets/fish2.png",
-        frames: [
-            { rect: [0, 0, 78, 64], label: "swim" },
-            { rect: [0, 64, 78, 64] },
-            { rect: [0, 128, 78, 64] },
-            { rect: [0, 192, 78, 64], jump: "swim" },
-            { rect: [0, 256, 78, 64], label: "capture" },
-            { rect: [0, 320, 78, 64] },
-            { rect: [0, 384, 78, 64] },
-            { rect: [0, 448, 78, 64], jump: "capture" }
-        ],
-        polyArea: [{ x: 15, y: 10 }, { x: 78, y: 10 }, { x: 78, y: 32 }, { x: 15, y: 32 }],
-        mixin: { coin: 3, captureRate: 0.50, maxNumGroup: 6, minSpeed: 0.5, maxSpeed: 1.2, regX: 58, regY: 20, interval: 10 }
+import { fishTypes } from './R_Fish.js';
+
+class Fish {
+    constructor(type, canvasWidth, canvasHeight) {
+        this.type = type;
+        this.canvasWidth = canvasWidth;
+        this.canvasHeight = canvasHeight;
+        this.image = new Image();
+        this.image.src = `images/${type.image}`;
+        this.frames = type.frames;
+        this.mixin = type.mixin;
+
+        // Khởi tạo vị trí và tốc độ
+        this.x = Math.random() > 0.5 ? -this.mixin.regX : canvasWidth + this.mixin.regX;
+        this.y = Math.random() * canvasHeight;
+        this.speed = Math.random() * (this.mixin.maxSpeed - this.mixin.minSpeed) + this.mixin.minSpeed;
+        this.direction = this.x < 0 ? 1 : -1;
+        this.currentFrame = 0;
+        this.frameInterval = this.mixin.interval;
+        this.frameCounter = 0;
     }
-];
 
-const config = {
-    type: Phaser.AUTO,
-    width: window.innerWidth,  // Chiều rộng toàn màn hình
-    height: window.innerHeight,  // Chiều cao toàn màn hình
-    parent: 'game-container',
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    },
-    scale: {
-        mode: Phaser.Scale.FIT, // Chế độ co giãn để vừa với màn hình
-        autoCenter: Phaser.Scale.CENTER_BOTH // Căn giữa game
+    update() {
+        // Di chuyển cá
+        this.x += this.speed * this.direction;
+
+        // Nếu rời khỏi màn hình, reset vị trí
+        if (this.direction === 1 && this.x > this.canvasWidth + this.mixin.regX) {
+            this.x = -this.mixin.regX;
+        } else if (this.direction === -1 && this.x < -this.mixin.regX) {
+            this.x = this.canvasWidth + this.mixin.regX;
+        }
+
+        // Cập nhật khung hình
+        this.frameCounter++;
+        if (this.frameCounter >= this.frameInterval) {
+            this.currentFrame = (this.currentFrame + 1) % this.frames.length;
+            this.frameCounter = 0;
+        }
     }
-};
 
-let fishGroup = [];
-let fishSprites = [];
-let lastFishSpawnTime = 0;
-
-function preload() {
-    this.load.image('background', 'assets/background.png'); // Đảm bảo có file background
-    fishTypes.forEach(fish => {
-        this.load.spritesheet(fish.image, fish.image, { frameWidth: fish.frames[0].rect[2], frameHeight: fish.frames[0].rect[3] });
-    });
+    draw(ctx) {
+        const frame = this.frames[this.currentFrame].rect;
+        ctx.drawImage(
+            this.image,
+            frame[0], frame[1], frame[2], frame[3],
+            this.x - this.mixin.regX, this.y - this.mixin.regY,
+            frame[2], frame[3]
+        );
+    }
 }
 
-function create() {
-    this.add.image(400, 300, 'background').setScale(2);
+class FishManager {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.fishes = [];
+        this.createFishes();
+    }
 
-    fishTypes.forEach((fishType, index) => {
-        const fishFrames = fishType.frames.map(f => f.rect);
-        this.anims.create({
-            key: fishType.frames[0].label || 'swim_' + index,
-            frames: this.anims.generateFrameNames(fishType.image, { frames: fishFrames }),
-            frameRate: 10,
-            repeat: -1
+    createFishes() {
+        fishTypes.forEach((type) => {
+            for (let i = 0; i < type.mixin.maxNumGroup; i++) {
+                this.fishes.push(new Fish(type, this.canvas.width, this.canvas.height));
+            }
         });
+    }
 
-        // Tạo cá ngẫu nhiên
-        for (let i = 0; i < fishType.mixin.maxNumGroup; i++) {
-            const x = Phaser.Math.Between(0, 800);
-            const y = Phaser.Math.Between(100, 500);
-            const fish = this.physics.add.sprite(x, y, fishType.image);
-            fish.setOrigin(fishType.mixin.regX / fish.width, fishType.mixin.regY / fish.height);
-            fish.setInteractive();
-            fish.play(fishType.frames[0].label || 'swim_' + index);
-            fish.setVelocityX(Phaser.Math.Between(fishType.mixin.minSpeed * 100, fishType.mixin.maxSpeed * 100));
-            fish.setVelocityY(Phaser.Math.Between(-50, 50));
-            fishSprites.push(fish);
-        }
-    });
-}
-
-function update(time, delta) {
-    // Duy trì các con cá bơi
-    fishSprites.forEach(fish => {
-        if (fish.x < 0 || fish.x > 800 || fish.y < 0 || fish.y > 600) {
-            fish.x = Phaser.Math.Between(0, 800);
-            fish.y = Phaser.Math.Between(100, 500);
-        }
-    });
-
-    // Tạo cá mới nếu cần
-    if (time - lastFishSpawnTime > 1000) {
-        lastFishSpawnTime = time;
-        const fishType = Phaser.Math.Between(0, fishTypes.length - 1);
-        const x = Phaser.Math.Between(0, 800);
-        const y = Phaser.Math.Between(100, 500);
-        const fish = this.physics.add.sprite(x, y, fishTypes[fishType].image);
-        fish.setOrigin(fishTypes[fishType].mixin.regX / fish.width, fishTypes[fishType].mixin.regY / fish.height);
-        fish.setInteractive();
-        fish.play(fishTypes[fishType].frames[0].label || 'swim_' + fishType);
-        fish.setVelocityX(Phaser.Math.Between(fishTypes[fishType].mixin.minSpeed * 100, fishTypes[fishType].mixin.maxSpeed * 100));
-        fish.setVelocityY(Phaser.Math.Between(-50, 50));
-        fishSprites.push(fish);
+    updateAndDraw() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.fishes.forEach((fish) => {
+            fish.update();
+            fish.draw(this.ctx);
+        });
     }
 }
 
-const game = new Phaser.Game(config);
+// Khởi tạo canvas và game loop
+const canvas = document.getElementById('gameCanvas');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const fishManager = new FishManager(canvas);
+
+function gameLoop() {
+    fishManager.updateAndDraw();
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
