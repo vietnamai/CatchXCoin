@@ -3,7 +3,7 @@
 import { fishTypes } from './R_Fish.js';
 import { cannonTypes } from './R_Cannon.js';
 
-export class GameScene extends Phaser.Scene {
+class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
         this.fishes = [];
@@ -124,3 +124,5 @@ export class GameScene extends Phaser.Scene {
         this.bullets = this.bullets.filter(bullet => bullet.active);
     }
 }
+
+export default GameScene;
