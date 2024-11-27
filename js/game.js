@@ -14,21 +14,30 @@ class Fish {
         this.x = Math.random() > 0.5 ? -this.mixin.regX : canvasWidth + this.mixin.regX;
         this.y = Math.random() * canvasHeight;
         this.speed = Math.random() * (this.mixin.maxSpeed - this.mixin.minSpeed) + this.mixin.minSpeed;
-        this.direction = this.x < 0 ? 1 : -1; // 1: từ trái sang phải, -1: từ phải sang trái
+
+        // Hướng ngẫu nhiên (theo góc độ, tính bằng radian)
+        this.angle = Math.random() * Math.PI * 2; // 0 đến 2π
+        this.angleSpeed = (Math.random() - 0.5) * 0.02; // Tốc độ thay đổi góc (nhỏ để tạo vòng cung)
+
         this.currentFrame = 0;
         this.frameInterval = this.mixin.interval;
         this.frameCounter = 0;
     }
 
     update() {
-        // Di chuyển cá
-        this.x += this.speed * this.direction;
+        // Tính toán vị trí mới dựa trên góc
+        this.x += Math.cos(this.angle) * this.speed;
+        this.y += Math.sin(this.angle) * this.speed;
 
-        // Nếu rời khỏi màn hình, reset vị trí
-        if (this.direction === 1 && this.x > this.canvasWidth + this.mixin.regX) {
-            this.x = -this.mixin.regX;
-        } else if (this.direction === -1 && this.x < -this.mixin.regX) {
-            this.x = this.canvasWidth + this.mixin.regX;
+        // Thay đổi góc để tạo chuyển động vòng cung
+        this.angle += this.angleSpeed;
+
+        // Nếu cá vượt ra khỏi màn hình, đưa nó quay lại vị trí ngẫu nhiên
+        if (this.x < -this.mixin.regX || this.x > this.canvasWidth + this.mixin.regX || 
+            this.y < -this.mixin.regY || this.y > this.canvasHeight + this.mixin.regY) {
+            this.x = Math.random() * this.canvasWidth;
+            this.y = Math.random() * this.canvasHeight;
+            this.angle = Math.random() * Math.PI * 2; // Đặt hướng mới
         }
 
         // Cập nhật khung hình
@@ -44,27 +53,16 @@ class Fish {
 
         ctx.save(); // Lưu trạng thái canvas
 
-        // Dịch và lật hình ảnh nếu cá di chuyển từ phải sang trái
-        if (this.direction === -1) {
-            ctx.translate(this.x, this.y); // Dịch điểm gốc
-            ctx.scale(-1, 1); // Lật theo trục X
-            ctx.drawImage(
-                this.image,
-                frame[0], frame[1], frame[2], frame[3],
-                -this.mixin.regX - frame[2], // Cần bù trừ để vị trí chính xác khi lật
-                -this.mixin.regY,
-                frame[2], frame[3]
-            );
-        } else {
-            ctx.translate(this.x, this.y);
-            ctx.drawImage(
-                this.image,
-                frame[0], frame[1], frame[2], frame[3],
-                -this.mixin.regX,
-                -this.mixin.regY,
-                frame[2], frame[3]
-            );
-        }
+        // Dịch vị trí và xoay hình ảnh theo góc di chuyển
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+
+        ctx.drawImage(
+            this.image,
+            frame[0], frame[1], frame[2], frame[3],
+            -this.mixin.regX, -this.mixin.regY,
+            frame[2], frame[3]
+        );
 
         ctx.restore(); // Khôi phục trạng thái canvas
     }
