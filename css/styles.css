@@ -3,6 +3,9 @@ body, html {
   padding: 0;
   height: 100%;
   overflow: hidden; /* Ngăn chặn thanh cuộn */
+  background-color: #000; /* Màu nền mặc định */
+  background-size: cover; /* Đảm bảo hình nền luôn phủ toàn màn hình */
+  background-position: center; /* Căn giữa hình nền */
 }
 
 #game-container {
