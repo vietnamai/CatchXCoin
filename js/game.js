@@ -1,4 +1,4 @@
-console.log("UPDATE LẦN 1")
+console.log("UPDATE LẦN 2")
 
 const fishTypes = [
     {
