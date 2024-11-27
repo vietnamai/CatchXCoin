@@ -1,5 +1,5 @@
 // File: js/GameScene.js
-import Phaser from 'phaser';
+
 import { fishTypes } from './R_Fish.js';
 import { cannonTypes } from './R_Cannon.js';
 
