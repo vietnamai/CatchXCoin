@@ -11,55 +11,69 @@ class Fish {
 
         this.mixin = type.mixin;
         this.state = "swim"; // Trạng thái ban đầu: bơi
-        this.currentFrames = this.getFramesByState(this.state);
+        this.currentFrames = this.frames;
 
-        // Khởi tạo vị trí và tốc độ
-        this.x = Math.random() > 0.5 ? -this.mixin.regX : canvasWidth + this.mixin.regX;
-        this.y = Math.random() * canvasHeight;
+        // Khởi tạo vị trí ngẫu nhiên từ 4 cạnh
+        const side = Math.floor(Math.random() * 4); // 0: trái, 1: phải, 2: trên, 3: dưới
+        switch (side) {
+            case 0: // trái
+                this.x = -this.mixin.regX;
+                this.y = Math.random() * canvasHeight;
+                break;
+            case 1: // phải
+                this.x = canvasWidth + this.mixin.regX;
+                this.y = Math.random() * canvasHeight;
+                break;
+            case 2: // trên
+                this.x = Math.random() * canvasWidth;
+                this.y = -this.mixin.regY;
+                break;
+            case 3: // dưới
+                this.x = Math.random() * canvasWidth;
+                this.y = canvasHeight + this.mixin.regY;
+                break;
+        }
+
         this.speed = Math.random() * (this.mixin.maxSpeed - this.mixin.minSpeed) + this.mixin.minSpeed;
 
-        // Hướng ngẫu nhiên (theo góc độ, tính bằng radian)
-        this.angle = Math.random() * Math.PI * 2; // 0 đến 2π
-        this.angleSpeed = (Math.random() - 0.5) * 0.02; // Tốc độ thay đổi góc (nhỏ để tạo vòng cung)
+        // Hướng ngẫu nhiên
+        this.angle = Math.atan2(canvasHeight / 2 - this.y, canvasWidth / 2 - this.x); // Hướng về giữa màn hình
+        this.angleSpeed = (Math.random() - 0.5) * 0.02; // Để tạo vòng cung
 
         this.currentFrame = 0;
         this.frameInterval = this.mixin.interval;
         this.frameCounter = 0;
+
+        // Xác định kiểu bơi: 0 - thẳng, 1 - vòng cung, 2 - xéo
+        this.swimType = Math.floor(Math.random() * 3);
     }
 
-    // Lấy các khung hình dựa trên trạng thái
-    getFramesByState(state) {
-        const startIndex = this.frames.findIndex(frame => frame.label === state);
-        const endIndex = this.frames.findIndex(frame => frame.jump === state);
-
-        return this.frames.slice(startIndex, endIndex + 1);
-    }
-
-    // Chuyển trạng thái cá
-    setState(state) {
-        if (this.state !== state) {
-            this.state = state;
-            this.currentFrames = this.getFramesByState(state);
-            this.currentFrame = 0; // Đặt lại khung hình đầu tiên
-        }
-    }
-
+    // Cập nhật trạng thái di chuyển
     update() {
-        // Tính toán vị trí mới dựa trên góc
-        this.x += Math.cos(this.angle) * this.speed;
-        this.y += Math.sin(this.angle) * this.speed;
+        switch (this.swimType) {
+            case 0: // Bơi thẳng
+                this.x += Math.cos(this.angle) * this.speed;
+                this.y += Math.sin(this.angle) * this.speed;
+                break;
+            case 1: // Bơi vòng cung
+                this.angle += this.angleSpeed; // Thay đổi góc để tạo chuyển động vòng cung
+                this.x += Math.cos(this.angle) * this.speed;
+                this.y += Math.sin(this.angle) * this.speed;
+                break;
+            case 2: // Bơi xéo
+                this.x += Math.cos(this.angle + 0.1) * this.speed;
+                this.y += Math.sin(this.angle + 0.1) * this.speed;
+                break;
+        }
 
-        // Thay đổi góc để tạo chuyển động vòng cung
-        this.angle += this.angleSpeed;
-
-        // Nếu cá vượt ra khỏi màn hình, đưa nó quay lại vị trí ngẫu nhiên
+        // Nếu cá vượt khỏi màn hình, đặt lại vị trí ngẫu nhiên
         if (
             this.x < -this.mixin.regX || this.x > this.canvasWidth + this.mixin.regX ||
             this.y < -this.mixin.regY || this.y > this.canvasHeight + this.mixin.regY
         ) {
             this.x = Math.random() * this.canvasWidth;
             this.y = Math.random() * this.canvasHeight;
-            this.angle = Math.random() * Math.PI * 2; // Đặt hướng mới
+            this.angle = Math.random() * Math.PI * 2; // Đặt lại hướng ngẫu nhiên
         }
 
         // Cập nhật khung hình
@@ -71,13 +85,11 @@ class Fish {
     }
 
     draw(ctx) {
-        const frame = this.currentFrames[this.currentFrame].rect;
+        const frame = this.frames[this.currentFrame].rect;
 
         ctx.save(); // Lưu trạng thái canvas
-
-        // Dịch vị trí và xoay hình ảnh theo góc di chuyển
         ctx.translate(this.x, this.y);
-        ctx.rotate(this.angle);
+        ctx.rotate(this.angle); // Xoay hình ảnh theo hướng di chuyển
 
         ctx.drawImage(
             this.image,
@@ -110,12 +122,6 @@ class FishManager {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.fishes.forEach((fish) => {
             fish.update();
-
-            // Giả lập bắn chết cá sau 5 giây (chỉ để kiểm tra)
-            if (Math.random() < 0.001) {
-                fish.setState("capture");
-            }
-
             fish.draw(this.ctx);
         });
     }
