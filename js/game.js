@@ -1,3 +1,5 @@
+console.log("UPDATE LẦN 1")
+
 const fishTypes = [
     {
         image: "fish1.png",
