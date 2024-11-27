@@ -1,6 +1,5 @@
 // main.js
 
-import Phaser from 'phaser';
 import PreloadScene from './PreloadScene.js';  // Tải tài nguyên
 import GameScene from './GameScene.js';        // Xử lý gameplay
 
