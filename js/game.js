@@ -118,9 +118,9 @@ class FishManager {
             fish.update();
 
             // Giả lập bắn chết cá ngẫu nhiên (chỉ để kiểm tra)
-            if (Math.random() < 0.001 && fish.state !== "capture") {
-                fish.setState("capture");
-            }
+            //if (Math.random() < 0.001 && fish.state !== "capture") {
+               // fish.setState("capture");
+           // }
 
             fish.draw(this.ctx);
         });
