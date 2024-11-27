@@ -1,15 +1,20 @@
+/* Tổng thể trang web */
 body, html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: hidden; /* Ngăn chặn thanh cuộn */
-  background-color: #000; /* Màu nền mặc định */
-  background-size: cover; /* Đảm bảo hình nền luôn phủ toàn màn hình */
-  background-position: center; /* Căn giữa hình nền */
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Ẩn thanh cuộn */
+    background-color: #1a1a1a; /* Màu nền tối cho trang */
 }
 
-#game-container {
-  width: 100%;
-  height: 100%;
-  display: block;
+/* Canvas chứa game */
+#gameCanvas {
+    display: block;
+    margin: 0 auto;
+    background-color: #1e3d57; /* Màu nền biển */
+    position: absolute;
+    top: 0;
+    left: 0;
 }
+
