@@ -1,107 +1,116 @@
-import { fishTypes } from './R_Fish.js';
+const fishTypes = [
+    {
+        image: "fish1.png",
+        frames: [
+            { rect: [0, 0, 55, 37], label: "swim" },
+            { rect: [0, 37, 55, 37] },
+            { rect: [0, 74, 55, 37] },
+            { rect: [0, 111, 55, 37], jump: "swim" },
+            { rect: [0, 148, 55, 37], label: "capture" },
+            { rect: [0, 185, 55, 37] },
+            { rect: [0, 222, 55, 37] },
+            { rect: [0, 259, 55, 37], jump: "capture" }
+        ],
+        mixin: { coin: 1, captureRate: 0.55, maxNumGroup: 8, minSpeed: 50, maxSpeed: 120 }
+    },
+    {
+        image: "fish2.png",
+        frames: [
+            { rect: [0, 0, 78, 64], label: "swim" },
+            { rect: [0, 64, 78, 64] },
+            { rect: [0, 128, 78, 64] },
+            { rect: [0, 192, 78, 64], jump: "swim" },
+            { rect: [0, 256, 78, 64], label: "capture" },
+            { rect: [0, 320, 78, 64] },
+            { rect: [0, 384, 78, 64] },
+            { rect: [0, 448, 78, 64], jump: "capture" }
+        ],
+        mixin: { coin: 3, captureRate: 0.50, maxNumGroup: 6, minSpeed: 50, maxSpeed: 120 }
+    }
+];
 
-class FishGame extends Phaser.Scene {
+class FishScene extends Phaser.Scene {
     constructor() {
-        super({ key: 'FishGame' });
+        super({ key: 'FishScene' });
     }
 
     preload() {
-        // Tải sprite sheet cho từng loại cá
+        // Load assets
         fishTypes.forEach((type) => {
-            this.load.spritesheet(type.key, `images/${type.image}`, {
-                frameWidth: type.frameWidth, // Cập nhật đúng kích thước khung hình
-                frameHeight: type.frameHeight
+            this.load.spritesheet(type.image, `images/${type.image}`, {
+                frameWidth: type.frames[0].rect[2],
+                frameHeight: type.frames[0].rect[3]
             });
         });
     }
 
     create() {
-        this.fishes = this.physics.add.group();
+        // Group to hold all fish
+        this.fishGroup = this.physics.add.group();
 
-        // Tạo cá từ danh sách fishTypes
+        // Create fishes
         fishTypes.forEach((type) => {
             for (let i = 0; i < type.mixin.maxNumGroup; i++) {
-                const x = Phaser.Math.Between(0, this.game.config.width);
-                const y = Phaser.Math.Between(0, this.game.config.height);
-                const fish = this.fishes.create(x, y, type.key);
+                const x = Phaser.Math.Between(0, this.cameras.main.width);
+                const y = Phaser.Math.Between(0, this.cameras.main.height);
+                const speed = Phaser.Math.Between(type.mixin.minSpeed, type.mixin.maxSpeed);
+                const angle = Phaser.Math.FloatBetween(0, 360);
 
-                // Tùy chỉnh tốc độ và góc di chuyển
-                fish.speed = Phaser.Math.Between(
-                    type.mixin.minSpeed,
-                    type.mixin.maxSpeed
+                const fish = this.physics.add.sprite(x, y, type.image);
+                fish.setVelocity(
+                    Math.cos(angle) * speed,
+                    Math.sin(angle) * speed
                 );
-                fish.angleSpeed = Phaser.Math.FloatBetween(-0.02, 0.02);
 
                 fish.type = type;
-                fish.state = 'swim';
+                fish.state = "swim";
+
+                this.fishGroup.add(fish);
+
+                // Add animations
+                this.anims.create({
+                    key: `${type.image}_swim`,
+                    frames: this.anims.generateFrameNumbers(type.image, { start: 0, end: 3 }),
+                    frameRate: 10,
+                    repeat: -1
+                });
+
+                this.anims.create({
+                    key: `${type.image}_capture`,
+                    frames: this.anims.generateFrameNumbers(type.image, { start: 4, end: 7 }),
+                    frameRate: 10,
+                    repeat: 0
+                });
+
+                fish.play(`${type.image}_swim`);
             }
-        });
-
-        // Thêm Animation cho cá
-        fishTypes.forEach((type) => {
-            this.anims.create({
-                key: `${type.key}_swim`,
-                frames: this.anims.generateFrameNumbers(type.key, {
-                    start: type.frames[0].start,
-                    end: type.frames[0].end
-                }),
-                frameRate: 10,
-                repeat: -1
-            });
-
-            this.anims.create({
-                key: `${type.key}_capture`,
-                frames: this.anims.generateFrameNumbers(type.key, {
-                    start: type.frames[1].start,
-                    end: type.frames[1].end
-                }),
-                frameRate: 10,
-                repeat: 0
-            });
-        });
-
-        // Phát animation mặc định (bơi)
-        this.fishes.getChildren().forEach((fish) => {
-            fish.play(`${fish.type.key}_swim`);
         });
     }
 
     update() {
-        this.fishes.getChildren().forEach((fish) => {
-            // Di chuyển cá
-            fish.x += Math.cos(fish.angle) * fish.speed;
-            fish.y += Math.sin(fish.angle) * fish.speed;
-            fish.angle += fish.angleSpeed;
-
-            // Đưa cá quay lại màn hình nếu vượt ra ngoài
-            if (fish.x < 0) fish.x = this.game.config.width;
-            if (fish.x > this.game.config.width) fish.x = 0;
-            if (fish.y < 0) fish.y = this.game.config.height;
-            if (fish.y > this.game.config.height) fish.y = 0;
-
-            // Chuyển trạng thái ngẫu nhiên sang "capture"
-            if (Math.random() < 0.001 && fish.state !== 'capture') {
-                fish.state = 'capture';
-                fish.play(`${fish.type.key}_capture`);
-                fish.once('animationcomplete', () => {
-                    fish.state = 'swim';
-                    fish.play(`${fish.type.key}_swim`);
-                });
+        this.fishGroup.children.iterate((fish) => {
+            // Check if the fish is out of bounds and reset position
+            if (fish.x < 0 || fish.x > this.cameras.main.width || fish.y < 0 || fish.y > this.cameras.main.height) {
+                fish.x = Phaser.Math.Between(0, this.cameras.main.width);
+                fish.y = Phaser.Math.Between(0, this.cameras.main.height);
             }
         });
     }
 }
 
-// Cấu hình Phaser
+// Game configuration
 const config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
     height: window.innerHeight,
-    scene: [FishGame],
+    scene: FishScene,
     physics: {
-        default: 'arcade'
+        default: 'arcade',
+        arcade: {
+            debug: false
+        }
     }
 };
 
-// Khởi tạo game
+// Create the game
 const game = new Phaser.Game(config);
