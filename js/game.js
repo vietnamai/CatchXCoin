@@ -70,32 +70,59 @@ class Fish {
     }
 
     update() {
-        if (this.state === "swim") {
-            this.x += Math.cos(this.angle) * this.speed;
-            this.y += Math.sin(this.angle) * this.speed;
+    if (this.state === "swim") {
+        this.x += Math.cos(this.angle) * this.speed;
+        this.y += Math.sin(this.angle) * this.speed;
 
-            this.angle += this.angleSpeed;
+        this.angle += this.angleSpeed;
 
-            if (
-                this.x < -this.mixin.regX || this.x > this.canvasWidth + this.mixin.regX ||
-                this.y < -this.mixin.regY || this.y > this.canvasHeight + this.mixin.regY
-            ) {
-                this.x = Math.random() * this.canvasWidth;
-                this.y = Math.random() * this.canvasHeight;
-                this.angle = Math.random() * Math.PI * 2;
-            }
-        }
-
-        this.frameCounter++;
-        if (this.frameCounter >= this.frameInterval) {
-            this.currentFrame = (this.currentFrame + 1) % this.currentFrames.length;
-            this.frameCounter = 0;
-
-            if (this.state === "capture" && this.currentFrame === 0) {
-                this.setState("swim");
-            }
+        // Kiểm tra vị trí cá và tái tạo khi ra khỏi màn hình
+        const buffer = 50; // khoảng cách để làm mượt
+        if (
+            this.x < -buffer || this.x > this.canvasWidth + buffer ||
+            this.y < -buffer || this.y > this.canvasHeight + buffer
+        ) {
+            this.resetPosition();
         }
     }
+
+    this.frameCounter++;
+    if (this.frameCounter >= this.frameInterval) {
+        this.currentFrame = (this.currentFrame + 1) % this.currentFrames.length;
+        this.frameCounter = 0;
+
+        if (this.state === "capture" && this.currentFrame === 0) {
+            this.setState("swim");
+        }
+    }
+}
+
+// Hàm tái tạo vị trí cá
+resetPosition() {
+    const sides = ["top", "bottom", "left", "right"];
+    const side = sides[Math.floor(Math.random() * sides.length)];
+
+    switch (side) {
+        case "top":
+            this.x = Math.random() * this.canvasWidth;
+            this.y = -this.mixin.regY; // xuất hiện phía trên
+            break;
+        case "bottom":
+            this.x = Math.random() * this.canvasWidth;
+            this.y = this.canvasHeight + this.mixin.regY; // xuất hiện phía dưới
+            break;
+        case "left":
+            this.x = -this.mixin.regX; // xuất hiện bên trái
+            this.y = Math.random() * this.canvasHeight;
+            break;
+        case "right":
+            this.x = this.canvasWidth + this.mixin.regX; // xuất hiện bên phải
+            this.y = Math.random() * this.canvasHeight;
+            break;
+    }
+
+    this.angle = Math.random() * Math.PI * 2; // hướng di chuyển mới
+}
 
     draw(ctx) {
         const frame = this.currentFrames[this.currentFrame].rect;
