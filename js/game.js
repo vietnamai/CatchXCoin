@@ -14,7 +14,7 @@ class Fish {
         this.x = Math.random() > 0.5 ? -this.mixin.regX : canvasWidth + this.mixin.regX;
         this.y = Math.random() * canvasHeight;
         this.speed = Math.random() * (this.mixin.maxSpeed - this.mixin.minSpeed) + this.mixin.minSpeed;
-        this.direction = this.x < 0 ? 1 : -1;
+        this.direction = this.x < 0 ? 1 : -1; // 1: từ trái sang phải, -1: từ phải sang trái
         this.currentFrame = 0;
         this.frameInterval = this.mixin.interval;
         this.frameCounter = 0;
@@ -41,12 +41,32 @@ class Fish {
 
     draw(ctx) {
         const frame = this.frames[this.currentFrame].rect;
-        ctx.drawImage(
-            this.image,
-            frame[0], frame[1], frame[2], frame[3],
-            this.x - this.mixin.regX, this.y - this.mixin.regY,
-            frame[2], frame[3]
-        );
+
+        ctx.save(); // Lưu trạng thái canvas
+
+        // Dịch và lật hình ảnh nếu cá di chuyển từ phải sang trái
+        if (this.direction === -1) {
+            ctx.translate(this.x, this.y); // Dịch điểm gốc
+            ctx.scale(-1, 1); // Lật theo trục X
+            ctx.drawImage(
+                this.image,
+                frame[0], frame[1], frame[2], frame[3],
+                -this.mixin.regX - frame[2], // Cần bù trừ để vị trí chính xác khi lật
+                -this.mixin.regY,
+                frame[2], frame[3]
+            );
+        } else {
+            ctx.translate(this.x, this.y);
+            ctx.drawImage(
+                this.image,
+                frame[0], frame[1], frame[2], frame[3],
+                -this.mixin.regX,
+                -this.mixin.regY,
+                frame[2], frame[3]
+            );
+        }
+
+        ctx.restore(); // Khôi phục trạng thái canvas
     }
 }
 
