@@ -1,19 +1,12 @@
-/* Đảm bảo body chiếm toàn bộ màn hình và có hình nền */
 body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;  /* Ẩn thanh cuộn */
-    background-size: cover;  /* Hình nền sẽ tự động bao phủ toàn bộ màn hình */
-    background-position: center;  /* Căn chỉnh hình nền vào giữa */
-    background-repeat: no-repeat;  /* Không lặp lại hình nền */
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden; /* Ngăn chặn thanh cuộn */
 }
 
-/* Canvas chiếm toàn bộ chiều rộng và chiều cao */
-canvas {
-    display: block;  /* Loại bỏ khoảng cách dưới canvas */
-    width: 100%;
-    height: 100%;
-    background-color: transparent; /* Nếu bạn muốn nền trong suốt */
+#game-container {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
