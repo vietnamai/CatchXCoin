@@ -7,14 +7,3 @@ body, html {
     overflow: hidden; /* Ẩn thanh cuộn */
     background-color: #1a1a1a; /* Màu nền tối cho trang */
 }
-
-/* Canvas chứa game */
-/* #gameCanvas { */
-/*    display: block; */
-/*    margin: 0 auto; */
-/*    background-color: #1e3d57; */ /* Màu nền biển */
-/*    position: absolute;  */
-/*    top: 0;   */
-/*    left: 0;  */
-/*  }  */
-
