@@ -1,4 +1,33 @@
-console.log("UPDATE LẦN 2")
+console.log("UPDATE LẦN 1")
+
+
+
+// Danh sách hình nền
+const bgImages = [
+    "images/Bgg1.jpg",
+    "images/Bgg2.jpg",
+    "images/Bgg3.jpg",
+    "images/Bgg4.jpg",
+    "images/Bgg5.jpg",
+    "images/Bgg6.jpg",
+    "images/Bgg7.jpg",
+    "images/Bgg8.jpg"
+];
+
+// Hàm random và áp dụng background
+function applyRandomBackground() {
+    const randomIndex = Math.floor(Math.random() * bgImages.length); // Lấy chỉ số ngẫu nhiên
+    const selectedImage = bgImages[randomIndex]; // Chọn hình nền dựa vào chỉ số
+    document.body.style.backgroundImage = `url('${selectedImage}')`; // Gán hình nền cho body
+    document.body.style.backgroundSize = "cover"; // Đảm bảo hình nền phủ toàn bộ
+    document.body.style.backgroundPosition = "center"; // Căn giữa hình nền
+    document.body.style.backgroundRepeat = "no-repeat"; // Không lặp lại hình nền
+}
+
+// Gọi hàm khi trang được tải
+window.onload = applyRandomBackground;
+
+
 
 const fishTypes = [
     {
