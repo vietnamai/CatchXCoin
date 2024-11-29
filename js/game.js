@@ -38,8 +38,8 @@ function shoot(event) {
     const angle = Math.atan2(event.clientY - cannonCenterY, event.clientX - cannonCenterX); // Góc bắn tính từ cannon đến điểm click
 
     // Tạo một đối tượng Bullet và bắn theo hướng đã tính
-    const bullet = new Bullet(bulletTypes[0], cannonCenterX, cannonCenterY, angle); // Tạo đạn từ loại đầu tiên trong bulletTypes
-    bulletManager.addBullet(bullet); // Thêm đạn vào danh sách quản lý đạn
+    // Truyền tham số đúng vào addBullet
+    bulletManager.addBullet(bulletTypes[0], cannonCenterX, cannonCenterY, event.clientX, event.clientY);
 }
 
 // Hàm cập nhật vị trí của cannon theo chuột
@@ -58,8 +58,6 @@ function init() {
     cannon.init();
     fishManager.init();
     bulletManager.init();
-
-    // Khởi tạo WebManager
     webManager.init();
 
     // Gọi hàm update lần đầu tiên
@@ -75,9 +73,7 @@ function update(timestamp) {
     // Cập nhật trạng thái các đối tượng
     cannon.update(deltaTime);
     fishManager.update(deltaTime);
-    bulletManager.update(deltaTime);
-
-    // Cập nhật trạng thái của WebManager (kiểm tra va chạm, vẽ lưới)
+    bulletManager.updateAndDraw(ctx, fishManager.fishes); // Truyền danh sách cá từ fishManager
     webManager.update(deltaTime);
 
     // Vẽ lại khung hình
@@ -95,7 +91,7 @@ function render() {
     // Vẽ các đối tượng
     fishManager.render(ctx);
     bulletManager.render(ctx);
-    webManager.render(ctx); // Vẽ các lưới
+    webManager.render(ctx);
     cannon.render(ctx);
 }
 
