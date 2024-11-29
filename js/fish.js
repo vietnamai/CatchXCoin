@@ -141,7 +141,7 @@ class FishManager {
 
     
     // Hàm cập nhật và kiểm tra cá trong phạm vi lưới
-function updateWebs() {
+    updateWebs() {
     this.webs.forEach((web, index) => {
         web.update();
         if (web.isAnimationComplete()) {
