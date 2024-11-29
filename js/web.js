@@ -79,3 +79,5 @@ class WebManager {
         this.webs = this.webs.filter(web => web.isActive); // Xóa những lưới không còn hoạt động
     }
 }
+
+export { Web, WebManager };
