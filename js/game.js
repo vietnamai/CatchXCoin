@@ -53,11 +53,6 @@ function updateCannonPosition(event) {
 
 // Hàm khởi tạo game
 function init() {
-    // Không gọi init() nữa, chỉ cần khởi tạo các đối tượng
-    fishManager.init();
-    bulletManager.init();
-    webManager.init();
-
     // Gọi hàm update lần đầu tiên
     lastTime = performance.now();
     requestAnimationFrame(update);
