@@ -14,6 +14,18 @@ class Cannon {
         this.isFiring = false;
     }
 
+    // Phương thức tăng cấp độ súng
+    levelUp() {
+        const currentIndex = cannonTypes.indexOf(this.type);
+        if (currentIndex < cannonTypes.length - 1) {
+            this.type = cannonTypes[currentIndex + 1]; // Nâng cấp lên súng cấp tiếp theo
+            this.image.src = `images/${this.type.image}`;
+            this.frames = this.type.frames;
+            this.mixin = this.type.mixin;
+            this.currentFrame = 0; // Reset lại frame khi nâng cấp
+        }
+    }
+
     update() {
         if (this.isFiring) {
             this.frameCounter++;
@@ -71,6 +83,11 @@ class CannonManager {
         if (index >= 0 && index < bulletsTypes.length) {
             this.currentBulletType = bulletsTypes[index];
         }
+    }
+
+    // Phương thức nâng cấp súng
+    levelUpCannon() {
+        this.currentCannon.levelUp(); // Gọi phương thức levelUp của Cannon để nâng cấp
     }
 
     addClickEvent() {
