@@ -1,4 +1,4 @@
-const cannonTypes = [
+const cannonType = [
     {
         image: "cannon1.png",
         frames: [
