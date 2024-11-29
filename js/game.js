@@ -67,6 +67,24 @@ function init() {
     requestAnimationFrame(update);
 }
 
+// Hàm cập nhật đạn trong game
+function updateBullets() {
+    this.bullets.forEach((bullet, index) => {
+        bullet.update();
+        if (bullet.isOutOfBounds(this.canvas.width, this.canvas.height)) {
+            this.bullets.splice(index, 1);
+        } else {
+            // Kiểm tra va chạm với cá
+            const collision = this.fishManager.checkCollision(bullet); // Sử dụng checkCollision từ FishManager
+            if (collision) {
+                this.bullets.splice(index, 1); // Xóa viên đạn khi va chạm
+                this.spawnWeb(collision.x, collision.y, collision.radius); // Tạo lưới tại vị trí va chạm
+                this.score += collision.type.score; // Cập nhật điểm
+            }
+        }
+    });
+}
+
 // Hàm cập nhật trạng thái game
 function update(timestamp) {
     const deltaTime = timestamp - lastTime;
