@@ -121,15 +121,6 @@ class FishManager {
     }
 
     checkCollision(bullet) {
-        this.fishes.forEach((fish, index) => {
-            if (checkCircleCollision(fish, bullet)) {
-                fish.setState("capture");
-                this.fishes.splice(index, 1); // Xóa cá khỏi danh sách
-            }
-        });
-    }
-
-    checkCollision(bullet) {
         for (let fish of this.fishes) {
             // Kiểm tra va chạm đơn giản giữa đạn và cá (dùng khoảng cách)
             const dx = fish.x - bullet.x;
