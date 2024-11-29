@@ -57,6 +57,7 @@ class BulletManager {
         this.bullets = [];
     }
 
+    // Cập nhật phương thức addBullet
     addBullet(bulletType, startX, startY, targetX, targetY) {
         const bullet = new Bullet(bulletType, startX, startY, targetX, targetY);
         this.bullets.push(bullet);
