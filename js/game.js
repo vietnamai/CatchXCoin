@@ -10,9 +10,10 @@ const webManager = new WebManager();
 
 // Biến lưu trạng thái game
 let lastTime = 0;
+let isShooting = false; // Biến kiểm tra nếu người dùng đang giữ click chuột
 
-// Biến kiểm tra nếu người dùng đang giữ click chuột
-let isShooting = false;
+// Cập nhật loại web ban đầu
+webManager.upgradeWeb(cannonTypes[0].webType); // Nâng cấp lưới theo loại súng đầu tiên
 
 // Lắng nghe sự kiện click của người dùng
 canvas.addEventListener('mousedown', (event) => {
@@ -26,35 +27,43 @@ canvas.addEventListener('mouseup', () => {
 
 canvas.addEventListener('mousemove', (event) => {
     // Cập nhật vị trí cannon theo chuột
-    updateCannonPosition(event); // Cập nhật hướng cannon khi di chuyển chuột
+    updateCannonPosition(event);
 });
 
 // Hàm xử lý bắn đạn
 function shoot(event) {
-    // Tính toán hướng bắn từ vị trí của cannon và điểm click của người dùng
     const cannonCenterX = cannon.x + cannon.mixin.regX; // Tính tọa độ trung tâm cannon
     const cannonCenterY = cannon.y + cannon.mixin.regY;
 
-    const angle = Math.atan2(event.clientY - cannonCenterY, event.clientX - cannonCenterX); // Góc bắn tính từ cannon đến điểm click
+    const angle = Math.atan2(event.clientY - cannonCenterY, event.clientX - cannonCenterX); // Góc bắn
+    cannon.angle = angle; // Cập nhật góc cho cannon
 
-    // Tạo một đối tượng Bullet và bắn theo hướng đã tính
-    bulletManager.addBullet(bulletTypes[0], cannonCenterX, cannonCenterY, event.clientX, event.clientY);
+    // Tạo một viên đạn mới
+    const bulletType = bulletTypes[cannon.type.bulletIndex]; // Lấy loại đạn tương ứng với súng
+    bulletManager.addBullet(bulletType, cannonCenterX, cannonCenterY, event.clientX, event.clientY);
+
+    // Tạo lưới ngay tại vị trí viên đạn
+    webManager.createWeb(event.clientX, event.clientY);
+}
+
+// Hàm nâng cấp súng
+function upgradeCannon(newCannonType) {
+    cannon.upgrade(newCannonType); // Nâng cấp súng
+    webManager.upgradeWeb(newCannonType.webType); // Nâng cấp lưới theo loại súng mới
 }
 
 // Hàm cập nhật vị trí của cannon theo chuột
 function updateCannonPosition(event) {
-    const cannonCenterX = cannon.x + cannon.mixin.regX; // Tính tọa độ trung tâm cannon
+    const cannonCenterX = cannon.x + cannon.mixin.regX;
     const cannonCenterY = cannon.y + cannon.mixin.regY;
-    const angle = Math.atan2(event.clientY - cannonCenterY, event.clientX - cannonCenterX); // Cập nhật góc của cannon
 
-    // Cập nhật góc của cannon để nó luôn hướng về phía chuột
-    cannon.angle = angle;
+    const angle = Math.atan2(event.clientY - cannonCenterY, event.clientX - cannonCenterX);
+    cannon.angle = angle; // Cập nhật góc của cannon
 }
 
 // Hàm khởi tạo game
 function init() {
-    // Gọi hàm update lần đầu tiên
-    lastTime = performance.now();
+    lastTime = performance.now(); // Gọi hàm update lần đầu tiên
     requestAnimationFrame(update);
 }
 
@@ -67,7 +76,7 @@ function update(timestamp) {
     cannon.update();
     fishManager.updateAndDraw();
     bulletManager.updateAndDraw(ctx, fishManager.fishes); // Truyền danh sách cá từ fishManager
-    webManager.update(deltaTime);
+    webManager.cleanup(); // Dọn dẹp lưới không còn hiệu lực
 
     // Vẽ lại khung hình
     render();
@@ -78,13 +87,12 @@ function update(timestamp) {
 
 // Hàm vẽ lại tất cả đối tượng lên canvas
 function render() {
-    // Xóa canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Xóa canvas
 
     // Vẽ các đối tượng
     fishManager.render(ctx);
     bulletManager.render(ctx);
-    webManager.render(ctx);
+    webManager.drawAll(ctx); // Vẽ tất cả lưới
     cannon.render(ctx);
 }
 
