@@ -148,4 +148,24 @@ class FishManager {
         return null; // Không có va chạm
     }
 
+    
+    // Hàm cập nhật và kiểm tra cá trong phạm vi lưới
+function updateWebs() {
+    this.webs.forEach((web, index) => {
+        web.update();
+        if (web.isAnimationComplete()) {
+            this.webs.splice(index, 1);
+        }
+
+        // Kiểm tra cá có bị bắt trong lưới không
+        this.fishManager.fishes.forEach(fish => {
+            if (web.isFishInside(fish)) {  // Kiểm tra va chạm giữa lưới và cá
+                web.deactivate(); // Vô hiệu hóa lưới sau khi va chạm
+                // Cập nhật điểm hoặc logic khác ở đây
+            }
+        });
+    });
+}
+
+
 }
