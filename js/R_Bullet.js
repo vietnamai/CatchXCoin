@@ -1,4 +1,4 @@
-const bulletsTypes = [
+const bulletTypes = [
 	{image:"bullet.png", rect:[86,0,24,26], regX:12, regY:13},
 	{image:"bullet.png", rect:[61,0,25,29], regX:12, regY:14},
 	{image:"bullet.png", rect:[32,35,27,31], regX:13, regY:15},
