@@ -1,6 +1,3 @@
-// Import cannonTypes.js
-import { cannonTypes } from './cannonTypes.js';
-
 // Khởi tạo canvas và ngữ cảnh vẽ
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
