@@ -28,11 +28,19 @@ class GameManager {
     }
 
     shootBullet(x, y) {
-        const bullet = this.cannon.shoot();
-        if (bullet) {
-            this.bullets.push(bullet);
-        }
+    const bullet = this.cannon.shoot();
+    if (bullet) {
+        this.bullets.push(bullet);
+        this.spawnWeb(x, y, bullet.radius);  // Đảm bảo truyền radius của đạn cho web
     }
+}
+
+   spawnWeb(x, y, radius) {
+    // Lấy cấp độ súng từ cannon và tạo web tương ứng với cấp độ đó
+    const currentWebType = this.cannon.level; // Dùng cấp độ súng
+    const web = new Web(currentWebType, x, y, radius, this.images.web); // Dùng cấp độ súng làm loại lưới
+    this.webs.push(web);
+}
 
     updateBullets() {
         this.bullets.forEach((bullet, index) => {
@@ -49,12 +57,7 @@ class GameManager {
                 }
             }
         });
-    }
-
-    spawnWeb(x, y, radius) {
-        const web = new Web(x, y, radius, this.images.web);
-        this.webs.push(web);
-    }
+    }   
 
     updateWebs() {
         this.webs.forEach((web, index) => {
