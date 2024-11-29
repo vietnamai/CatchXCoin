@@ -52,11 +52,21 @@ class Web {
 class WebManager {
     constructor() {
         this.webs = []; // Danh sách các lưới
+        this.currentWebType = null; // Loại lưới hiện tại
+    }
+
+    // Đặt loại lưới mới khi nâng cấp súng
+    upgradeWeb(newWebType) {
+        this.currentWebType = newWebType;
     }
 
     // Tạo và thêm lưới mới
-    createWeb(type, x, y) {
-        const newWeb = new Web(type, x, y);
+    createWeb(x, y) {
+        if (!this.currentWebType) {
+            console.warn("Web type is not set. Use upgradeWeb() to set the web type.");
+            return;
+        }
+        const newWeb = new Web(this.currentWebType, x, y);
         this.webs.push(newWeb);
     }
 
@@ -79,5 +89,3 @@ class WebManager {
         this.webs = this.webs.filter(web => web.isActive); // Xóa những lưới không còn hoạt động
     }
 }
-
-export { Web, WebManager };
