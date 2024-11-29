@@ -48,3 +48,36 @@ class Web {
         this.isActive = false; // Lưới ngừng hoạt động sau khi kiểm tra va chạm
     }
 }
+
+class WebManager {
+    constructor() {
+        this.webs = []; // Danh sách các lưới
+    }
+
+    // Tạo và thêm lưới mới
+    createWeb(type, x, y) {
+        const newWeb = new Web(type, x, y);
+        this.webs.push(newWeb);
+    }
+
+    // Vẽ tất cả các lưới
+    drawAll(ctx) {
+        this.webs.forEach(web => web.draw(ctx));
+    }
+
+    // Kiểm tra va chạm với cá
+    checkFishInWebs(fish) {
+        this.webs.forEach(web => {
+            if (web.isFishInside(fish)) {
+                web.deactivate(); // Vô hiệu hóa lưới sau khi va chạm
+            }
+        });
+    }
+
+    // Xóa lưới không còn hiệu lực
+    cleanup() {
+        this.webs = this.webs.filter(web => web.isActive); // Xóa những lưới không còn hoạt động
+    }
+}
+
+export { Web, WebManager };
