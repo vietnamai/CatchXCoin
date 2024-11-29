@@ -65,7 +65,7 @@ function update(timestamp) {
 
     // Cập nhật trạng thái các đối tượng
     cannon.update();
-    fishManager.updateAndDraw(deltaTime);
+    fishManager.updateAndDraw();
     bulletManager.updateAndDraw(ctx, fishManager.fishes); // Truyền danh sách cá từ fishManager
     webManager.update(deltaTime);
 
