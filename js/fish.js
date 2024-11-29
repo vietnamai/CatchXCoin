@@ -128,4 +128,24 @@ class FishManager {
             }
         });
     }
+
+    checkCollision(bullet) {
+        for (let fish of this.fishes) {
+            // Kiểm tra va chạm đơn giản giữa đạn và cá (dùng khoảng cách)
+            const dx = fish.x - bullet.x;
+            const dy = fish.y - bullet.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < fish.radius + bullet.radius) {  // Nếu va chạm
+                return {
+                    x: fish.x,
+                    y: fish.y,
+                    radius: fish.radius,
+                    type: fish.type // Trả về loại cá để tính điểm
+                };
+            }
+        }
+        return null; // Không có va chạm
+    }
+
 }
