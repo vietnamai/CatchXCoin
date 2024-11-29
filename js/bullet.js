@@ -96,23 +96,3 @@ class BulletManager {
         });
     }
 }
-
-
-
-
-
-
-
-class BulletManager {
-    constructor() {
-        this.bullets = []; // Danh sách các viên đạn hiện có
-        this.currentBulletType = bulletTypes[0]; // Loại đạn mặc định
-    }
-
-    addBullet(startX, startY, targetX, targetY) {
-        const bullet = new Bullet(this.currentBulletType, startX, startY, targetX, targetY);
-        this.bullets.push(bullet);
-    }
-
-    // Các phương thức còn lại...
-}
