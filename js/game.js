@@ -58,6 +58,8 @@ function init() {
     cannon.init();
     fishManager.init();
     bulletManager.init();
+
+    // Khởi tạo WebManager
     webManager.init();
 
     // Gọi hàm update lần đầu tiên
@@ -74,6 +76,8 @@ function update(timestamp) {
     cannon.update(deltaTime);
     fishManager.update(deltaTime);
     bulletManager.update(deltaTime);
+
+    // Cập nhật trạng thái của WebManager (kiểm tra va chạm, vẽ lưới)
     webManager.update(deltaTime);
 
     // Vẽ lại khung hình
@@ -91,7 +95,7 @@ function render() {
     // Vẽ các đối tượng
     fishManager.render(ctx);
     bulletManager.render(ctx);
-    webManager.render(ctx);
+    webManager.render(ctx); // Vẽ các lưới
     cannon.render(ctx);
 }
 
