@@ -8,6 +8,17 @@ const fishManager = new FishManager(canvas);
 const bulletManager = new BulletManager();
 const webManager = new WebManager();
 
+// Khởi tạo ButtonManager
+const buttonManager = new ButtonManager();
+
+// Tạo các nút + và -
+const cannonMinusButton = new Button(cannonMinus, 50, canvas.height - 60);  // Nút giảm súng, ví dụ đặt ở bên trái
+const cannonPlusButton = new Button(cannonPlus, canvas.width - 100, canvas.height - 60); // Nút tăng súng, ví dụ đặt ở bên phải
+
+// Thêm các nút vào ButtonManager
+buttonManager.addButton(cannonMinusButton);
+buttonManager.addButton(cannonPlusButton);
+
 // Biến lưu trạng thái game
 let lastTime = 0;
 let isShooting = false; // Biến kiểm tra nếu người dùng đang giữ click chuột
@@ -61,6 +72,23 @@ function updateCannonPosition(event) {
     cannon.angle = angle; // Cập nhật góc của cannon
 }
 
+// Hàm kiểm tra nhấn nút
+function checkButtonClicks() {
+    buttonManager.checkButtonClick(cannonMinusButton, () => {
+        // Logic giảm súng
+        if (cannon.type !== cannonTypes[0]) { // Đảm bảo không hạ xuống dưới mức súng đầu tiên
+            upgradeCannon(cannonTypes[cannonTypes.indexOf(cannon.type) - 1]);
+        }
+    });
+
+    buttonManager.checkButtonClick(cannonPlusButton, () => {
+        // Logic tăng súng
+        if (cannon.type !== cannonTypes[cannonTypes.length - 1]) { // Đảm bảo không vượt quá súng tối đa
+            upgradeCannon(cannonTypes[cannonTypes.indexOf(cannon.type) + 1]);
+        }
+    });
+}
+
 // Hàm khởi tạo game
 function init() {
     lastTime = performance.now(); // Gọi hàm update lần đầu tiên
@@ -69,17 +97,16 @@ function init() {
 
 // Hàm cập nhật đạn trong game
 function updateBullets() {
-    this.bullets.forEach((bullet, index) => {
+    bulletManager.bullets.forEach((bullet, index) => {
         bullet.update();
-        if (bullet.isOutOfBounds(this.canvas.width, this.canvas.height)) {
-            this.bullets.splice(index, 1);
+        if (bullet.isOutOfBounds(canvas.width, canvas.height)) {
+            bulletManager.bullets.splice(index, 1);
         } else {
             // Kiểm tra va chạm với cá
-            const collision = this.fishManager.checkCollision(bullet); // Sử dụng checkCollision từ FishManager
+            const collision = fishManager.checkCollision(bullet); // Sử dụng checkCollision từ FishManager
             if (collision) {
-                this.bullets.splice(index, 1); // Xóa viên đạn khi va chạm
-                this.spawnWeb(collision.x, collision.y, collision.radius); // Tạo lưới tại vị trí va chạm
-                this.score += collision.type.score; // Cập nhật điểm
+                bulletManager.bullets.splice(index, 1); // Xóa viên đạn khi va chạm
+                webManager.createWeb(collision.x, collision.y); // Tạo lưới tại vị trí va chạm
             }
         }
     });
@@ -95,6 +122,9 @@ function update(timestamp) {
     fishManager.updateAndDraw();
     bulletManager.updateAndDraw(ctx, fishManager.fishes); // Truyền danh sách cá từ fishManager
     webManager.cleanup(); // Dọn dẹp lưới không còn hiệu lực
+
+    // Kiểm tra nhấn nút
+    checkButtonClicks();
 
     // Vẽ lại khung hình
     render();
