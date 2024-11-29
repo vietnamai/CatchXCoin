@@ -1,9 +1,12 @@
+// Import cannonTypes.js
+import { cannonTypes } from './cannonTypes.js';
+
 // Khởi tạo canvas và ngữ cảnh vẽ
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-// Khởi tạo các đối tượng game
-const cannon = new Cannon();
+// Khởi tạo các đối tượng game, sử dụng loại súng từ cannonTypes.js
+const cannon = new Cannon(cannonTypes[0], canvas.width, canvas.height); // Sử dụng loại súng đầu tiên trong cannonTypes
 const fishManager = new FishManager();
 const bulletManager = new BulletManager();
 const webManager = new WebManager();
