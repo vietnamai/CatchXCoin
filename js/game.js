@@ -38,7 +38,6 @@ function shoot(event) {
     const angle = Math.atan2(event.clientY - cannonCenterY, event.clientX - cannonCenterX); // Góc bắn tính từ cannon đến điểm click
 
     // Tạo một đối tượng Bullet và bắn theo hướng đã tính
-    // Truyền tham số đúng vào addBullet
     bulletManager.addBullet(bulletTypes[0], cannonCenterX, cannonCenterY, event.clientX, event.clientY);
 }
 
@@ -54,8 +53,7 @@ function updateCannonPosition(event) {
 
 // Hàm khởi tạo game
 function init() {
-    // Tải tài nguyên cần thiết và khởi tạo game
-    cannon.init();
+    // Không gọi init() nữa, chỉ cần khởi tạo các đối tượng
     fishManager.init();
     bulletManager.init();
     webManager.init();
@@ -71,7 +69,7 @@ function update(timestamp) {
     lastTime = timestamp;
 
     // Cập nhật trạng thái các đối tượng
-    cannon.update(deltaTime);
+    cannon.update();
     fishManager.update(deltaTime);
     bulletManager.updateAndDraw(ctx, fishManager.fishes); // Truyền danh sách cá từ fishManager
     webManager.update(deltaTime);
