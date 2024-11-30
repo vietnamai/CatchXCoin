@@ -93,9 +93,6 @@ function update(timestamp) {
     // Cập nhật trạng thái các nút
     buttonManager.update(canvas.mouseX, canvas.mouseY, canvas.isMouseDown);
 
-    // Vẽ lại khung hình
-    render();
-
     // Gọi update cho frame tiếp theo
     requestAnimationFrame(update);
 }
