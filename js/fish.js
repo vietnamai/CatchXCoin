@@ -1,4 +1,4 @@
-Code đay. Kiểm tra giùm đi:
+
 class Fish {
     constructor(type, canvasWidth, canvasHeight) {
         this.type = type;
