@@ -105,7 +105,7 @@ function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Xóa canvas
 
     // Vẽ các đối tượng
-    fishManager.render(ctx);
+    fishManager.updateAndDraw();
     bulletManager.render(ctx);
     webManager.drawAll(ctx); // Vẽ tất cả lưới
     cannon.render(ctx);
