@@ -11,13 +11,20 @@ const webManager = new WebManager();
 // Khởi tạo ButtonManager
 const buttonManager = new ButtonManager();
 
-// Tạo các nút + và -
-const cannonMinusButton = new Button(cannonMinus, 50, canvas.height - 60);  // Nút giảm súng, ví dụ đặt ở bên trái
-const cannonPlusButton = new Button(cannonPlus, canvas.width - 100, canvas.height - 60); // Nút tăng súng, ví dụ đặt ở bên phải
-
 // Thêm các nút vào ButtonManager
-buttonManager.addButton(cannonMinusButton);
-buttonManager.addButton(cannonPlusButton);
+buttonManager.addButton(cannonMinus, 50, canvas.height - 60, () => {
+    // Logic giảm cấp độ súng
+    if (cannon.type !== cannonTypes[0]) { // Đảm bảo không hạ xuống dưới mức súng đầu tiên
+        upgradeCannon(cannonTypes[cannonTypes.indexOf(cannon.type) - 1]);
+    }
+});
+
+buttonManager.addButton(cannonPlus, canvas.width - 100, canvas.height - 60, () => {
+    // Logic tăng cấp độ súng
+    if (cannon.type !== cannonTypes[cannonTypes.length - 1]) { // Đảm bảo không vượt quá súng tối đa
+        upgradeCannon(cannonTypes[cannonTypes.indexOf(cannon.type) + 1]);
+    }
+});
 
 // Biến lưu trạng thái game
 let lastTime = 0;
@@ -46,7 +53,7 @@ function shoot(event) {
     const cannonCenterX = cannon.x + cannon.mixin.regX; // Tính tọa độ trung tâm cannon
     const cannonCenterY = cannon.y + cannon.mixin.regY;
 
-    const angle = Math.atan2(event.clientY - cannonCenterY, event.clientX - cannonCenterX); // Góc bắn
+    const angle = Math.atan2(event.clientY - cannonCenterX, event.clientX - cannonCenterY); // Góc bắn
     cannon.angle = angle; // Cập nhật góc cho cannon
 
     // Tạo một viên đạn mới
@@ -72,46 +79,6 @@ function updateCannonPosition(event) {
     cannon.angle = angle; // Cập nhật góc của cannon
 }
 
-// Hàm kiểm tra nhấn nút
-function checkButtonClicks() {
-    buttonManager.checkButtonClick(cannonMinusButton, () => {
-        // Logic giảm súng
-        if (cannon.type !== cannonTypes[0]) { // Đảm bảo không hạ xuống dưới mức súng đầu tiên
-            upgradeCannon(cannonTypes[cannonTypes.indexOf(cannon.type) - 1]);
-        }
-    });
-
-    buttonManager.checkButtonClick(cannonPlusButton, () => {
-        // Logic tăng súng
-        if (cannon.type !== cannonTypes[cannonTypes.length - 1]) { // Đảm bảo không vượt quá súng tối đa
-            upgradeCannon(cannonTypes[cannonTypes.indexOf(cannon.type) + 1]);
-        }
-    });
-}
-
-// Hàm khởi tạo game
-function init() {
-    lastTime = performance.now(); // Gọi hàm update lần đầu tiên
-    requestAnimationFrame(update);
-}
-
-// Hàm cập nhật đạn trong game
-function updateBullets() {
-    bulletManager.bullets.forEach((bullet, index) => {
-        bullet.update();
-        if (bullet.isOutOfBounds(canvas.width, canvas.height)) {
-            bulletManager.bullets.splice(index, 1);
-        } else {
-            // Kiểm tra va chạm với cá
-            const collision = fishManager.checkCollision(bullet); // Sử dụng checkCollision từ FishManager
-            if (collision) {
-                bulletManager.bullets.splice(index, 1); // Xóa viên đạn khi va chạm
-                webManager.createWeb(collision.x, collision.y); // Tạo lưới tại vị trí va chạm
-            }
-        }
-    });
-}
-
 // Hàm cập nhật trạng thái game
 function update(timestamp) {
     const deltaTime = timestamp - lastTime;
@@ -123,8 +90,8 @@ function update(timestamp) {
     bulletManager.updateAndDraw(ctx, fishManager.fishes); // Truyền danh sách cá từ fishManager
     webManager.cleanup(); // Dọn dẹp lưới không còn hiệu lực
 
-    // Kiểm tra nhấn nút
-    checkButtonClicks();
+    // Cập nhật trạng thái các nút
+    buttonManager.update(canvas.mouseX, canvas.mouseY, canvas.isMouseDown);
 
     // Vẽ lại khung hình
     render();
@@ -142,6 +109,15 @@ function render() {
     bulletManager.render(ctx);
     webManager.drawAll(ctx); // Vẽ tất cả lưới
     cannon.render(ctx);
+
+    // Vẽ các nút
+    buttonManager.draw(ctx);
+}
+
+// Hàm khởi tạo game
+function init() {
+    lastTime = performance.now(); // Gọi hàm update lần đầu tiên
+    requestAnimationFrame(update);
 }
 
 // Khởi chạy game
