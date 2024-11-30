@@ -55,6 +55,11 @@ class WebManager {
         this.currentWebType = null; // Loại lưới hiện tại
     }
 
+    addWeb(cannonTypeIndex, x, y) {
+        const web = new Web(cannonTypeIndex, x, y); // Dùng cấp độ súng làm loại lưới
+        this.webs.push(web);
+    }
+
     // Đặt loại lưới mới khi nâng cấp súng
     upgradeWeb(newWebType) {
         this.currentWebType = newWebType;
