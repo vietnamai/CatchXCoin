@@ -6,6 +6,13 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+// Cập nhật lại kích thước canvas khi cửa sổ trình duyệt thay đổi
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+
+
 // Khởi tạo các đối tượng game, sử dụng loại súng từ cannonTypes.js
 const cannon = new Cannon(cannonTypes[0], canvas.width, canvas.height); // Sử dụng loại súng đầu tiên trong cannonTypes
 const fishManager = new FishManager(canvas);
